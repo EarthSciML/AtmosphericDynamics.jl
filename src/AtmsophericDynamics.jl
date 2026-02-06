@@ -1,3 +1,0 @@
-module AtmosphericDynamics
-
-end # module
