@@ -29,7 +29,7 @@ stab = AtmosphericStability()
 sys = mtkcompile(stab)
 ```
 """
-@component function AtmosphericStability(; name=:AtmosphericStability)
+@component function AtmosphericStability(; name = :AtmosphericStability)
     @constants begin
         # Physical constants from Seinfeld & Pandis Ch. 16
         g = 9.807, [description = "Gravitational acceleration", unit = u"m/s^2"]
@@ -104,14 +104,14 @@ surf = SurfaceLayerProfile()
 sys = mtkcompile(surf)
 ```
 """
-@component function SurfaceLayerProfile(; name=:SurfaceLayerProfile)
+@component function SurfaceLayerProfile(; name = :SurfaceLayerProfile)
     @constants begin
         # Physical constants
         g = 9.807, [description = "Gravitational acceleration", unit = u"m/s^2"]
         κ = 0.4, [description = "von Karman constant (dimensionless)", unit = u"1"]
         ĉ_p = 1005.0, [description = "Specific heat of air at constant pressure", unit = u"J/(kg*K)"]
         # Small value to prevent division by zero when heat flux is near zero
-        ε_q = 1e-10, [description = "Small regularization for heat flux", unit = u"W/m^2"]
+        ε_q = 1.0e-10, [description = "Small regularization for heat flux", unit = u"W/m^2"]
     end
 
     @parameters begin
@@ -146,32 +146,40 @@ sys = mtkcompile(surf)
         # For unstable conditions (ζ < 0): φ_m = (1 - 15ζ)^(-1/4), φ_h = (1 - 15ζ)^(-1/2)
         # For stable conditions (ζ > 0): φ_m = φ_h = 1 + 4.7ζ
         # For neutral (ζ ≈ 0): φ_m = φ_h = 1
-        φ_m ~ ifelse(ζ < 0,
+        φ_m ~ ifelse(
+            ζ < 0,
             (1 - 15 * ζ)^(-0.25),
-            1 + 4.7 * ζ),
+            1 + 4.7 * ζ
+        ),
 
-        φ_h ~ ifelse(ζ < 0,
+        φ_h ~ ifelse(
+            ζ < 0,
             (1 - 15 * ζ)^(-0.5),
-            1 + 4.7 * ζ),
+            1 + 4.7 * ζ
+        ),
 
         # Eq. 16.78-16.79: Integrated stability functions for profiles
         # For unstable (ζ < 0):
         #   ψ_m = 2ln((1+x)/2) + ln((1+x²)/2) - 2atan(x) + π/2, where x = (1-15ζ)^(1/4)
         #   ψ_h = 2ln((1+x²)/2), where x = (1-15ζ)^(1/4)
         # For stable (ζ > 0): ψ_m = ψ_h = -4.7ζ
-        ψ_m ~ ifelse(ζ < 0,
+        ψ_m ~ ifelse(
+            ζ < 0,
             begin
                 x = (1 - 15 * ζ)^0.25
                 2 * log((1 + x) / 2) + log((1 + x^2) / 2) - 2 * atan(x) + π / 2
             end,
-            -4.7 * ζ),
+            -4.7 * ζ
+        ),
 
-        ψ_h ~ ifelse(ζ < 0,
+        ψ_h ~ ifelse(
+            ζ < 0,
             begin
                 x = (1 - 15 * ζ)^0.25
                 2 * log((1 + x^2) / 2)
             end,
-            -4.7 * ζ),
+            -4.7 * ζ
+        ),
 
         # Eq. 16.66 with stability correction (Eq. 16.77):
         # ū(z) = (u*/κ)[ln(z/z₀) - ψ_m(ζ)]
@@ -223,7 +231,7 @@ met = LocalScaleMeteorology()
 sys = mtkcompile(met)
 ```
 """
-@component function LocalScaleMeteorology(; name=:LocalScaleMeteorology)
+@component function LocalScaleMeteorology(; name = :LocalScaleMeteorology)
     @constants begin
         # Physical constants
         g = 9.807, [description = "Gravitational acceleration", unit = u"m/s^2"]
@@ -233,7 +241,7 @@ sys = mtkcompile(met)
         p₀ = 101325.0, [description = "Reference pressure (sea level)", unit = u"Pa"]
         Γ_d = 9.76e-3, [description = "Dry adiabatic lapse rate (Eq. 16.8)", unit = u"K/m"]
         # Small value to prevent division by zero when heat flux is near zero
-        ε_q = 1e-10, [description = "Small regularization for heat flux", unit = u"W/m^2"]
+        ε_q = 1.0e-10, [description = "Small regularization for heat flux", unit = u"W/m^2"]
         # Dimensionless unit for log10 calculations
         z₀_ref = 1.0, [description = "Reference length for dimensionless log", unit = u"m"]
 
@@ -323,19 +331,23 @@ sys = mtkcompile(met)
         φ_h ~ ifelse(ζ < 0, (1 - 15 * ζ)^(-0.5), 1 + 4.7 * ζ),
 
         # Eq. 16.78-16.79: Integrated stability functions
-        ψ_m ~ ifelse(ζ < 0,
+        ψ_m ~ ifelse(
+            ζ < 0,
             begin
                 x = (1 - 15 * ζ)^0.25
                 2 * log((1 + x) / 2) + log((1 + x^2) / 2) - 2 * atan(x) + π / 2
             end,
-            -4.7 * ζ),
+            -4.7 * ζ
+        ),
 
-        ψ_h ~ ifelse(ζ < 0,
+        ψ_h ~ ifelse(
+            ζ < 0,
             begin
                 x = (1 - 15 * ζ)^0.25
                 2 * log((1 + x^2) / 2)
             end,
-            -4.7 * ζ),
+            -4.7 * ζ
+        ),
 
         # Eq. 16.66/16.77: Wind profile with stability correction
         ū ~ (u_star / κ) * (log(z / z₀) - ψ_m),
@@ -343,12 +355,22 @@ sys = mtkcompile(met)
         # === Pasquill Class from 1/L (Eq. 16.83) ===
         # Using Golder (1972) correlation: 1/L = a + b·log₁₀(z₀)
         # Classes based on comparing actual 1/L with class boundaries
-        pasquill_class ~ ifelse(L_inv < (a_A + b_A * log10(z₀ / z₀_ref)), 1,  # Class A (very unstable)
-            ifelse(L_inv < (a_B + b_B * log10(z₀ / z₀_ref)), 2,  # Class B
-                ifelse(L_inv < (a_C + b_C * log10(z₀ / z₀_ref)), 3,  # Class C
-                    ifelse(L_inv < (a_E + b_E * log10(z₀ / z₀_ref)), 4,  # Class D (neutral)
-                        ifelse(L_inv < (a_F + b_F * log10(z₀ / z₀_ref)), 5,  # Class E
-                            6))))),  # Class F (stable)
+        pasquill_class ~ ifelse(
+            L_inv < (a_A + b_A * log10(z₀ / z₀_ref)), 1,  # Class A (very unstable)
+            ifelse(
+                L_inv < (a_B + b_B * log10(z₀ / z₀_ref)), 2,  # Class B
+                ifelse(
+                    L_inv < (a_C + b_C * log10(z₀ / z₀_ref)), 3,  # Class C
+                    ifelse(
+                        L_inv < (a_E + b_E * log10(z₀ / z₀_ref)), 4,  # Class D (neutral)
+                        ifelse(
+                            L_inv < (a_F + b_F * log10(z₀ / z₀_ref)), 5,  # Class E
+                            6
+                        )
+                    )
+                )
+            )
+        ),  # Class F (stable)
     ]
 
     System(eqs, t; name)

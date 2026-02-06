@@ -78,7 +78,7 @@ where:
     end
 
     eqs = [
-    # Eq. 1.2 - Ideal gas law for air density
+        # Eq. 1.2 - Ideal gas law for air density
         rho ~ M_air * p / (R * T),
     ]
 
@@ -119,7 +119,7 @@ Typical values:
     end
 
     eqs = [
-    # Eq. 1.4 - Scale height definition
+        # Eq. 1.4 - Scale height definition
         H ~ R * T / (M_air * g),
     ]
 
@@ -176,7 +176,7 @@ and numerical integration of Eq. 1.3 would be required.
         # Eq. 1.2 - Ideal gas law for density
         rho ~ M_air * p / (R * T),
         # Eq. 1.1 / Eq. 1.3 - Hydrostatic equation (for reference)
-        dpdz ~ -rho * g
+        dpdz ~ -rho * g,
     ]
 
     return System(eqs, t; name)
@@ -211,13 +211,13 @@ atmosphere. The scale height H is provided as an input.
         H(t), [description = "Scale height", unit = u"m"]
         p(t), [description = "Pressure at altitude z", unit = u"Pa"]
         pressure_ratio(t),
-        [description = "Pressure ratio p/p_0 (dimensionless)", unit = u"1"]
+            [description = "Pressure ratio p/p_0 (dimensionless)", unit = u"1"]
     end
 
     eqs = [
         # Eq. 1.5 - Barometric formula
         pressure_ratio ~ exp(-z / H),
-        p ~ p_0 * pressure_ratio
+        p ~ p_0 * pressure_ratio,
     ]
 
     return System(eqs, t; name)
@@ -253,7 +253,7 @@ Standard values:
     end
 
     eqs = [
-    # Eq. 1.7 - Total molar concentration from ideal gas law
+        # Eq. 1.7 - Total molar concentration from ideal gas law
         c_total ~ p / (R * T),
     ]
 
@@ -283,7 +283,7 @@ The mixing ratio is dimensionless and typically expressed in ppm, ppb, or ppt.
     end
 
     eqs = [
-    # Eq. 1.6 - Volume mixing ratio definition
+        # Eq. 1.6 - Volume mixing ratio definition
         xi ~ c_i / c_total,
     ]
 
@@ -313,7 +313,7 @@ The mixing ratio equals the ratio of partial pressure to total pressure.
     end
 
     eqs = [
-    # Eq. 1.8 - Mixing ratio from partial pressure
+        # Eq. 1.8 - Mixing ratio from partial pressure
         xi ~ p_i / p,
     ]
 
@@ -355,7 +355,7 @@ Reference values:
         p_std = P_0, [description = "Standard pressure", unit = u"Pa"]
         # Empirical coefficients (dimensionless)
         c1 = 13.3185, [description = "Empirical coefficient 1 (dimensionless)", unit = u"1"]
-        c2 = 1.9760, [description = "Empirical coefficient 2 (dimensionless)", unit = u"1"]
+        c2 = 1.976, [description = "Empirical coefficient 2 (dimensionless)", unit = u"1"]
         c3 = 0.6445, [description = "Empirical coefficient 3 (dimensionless)", unit = u"1"]
         c4 = 0.1299, [description = "Empirical coefficient 4 (dimensionless)", unit = u"1"]
     end
@@ -363,7 +363,7 @@ Reference values:
     @variables begin
         T(t), [description = "Temperature", unit = u"K"]
         a(t),
-        [description = "Dimensionless temperature parameter (dimensionless)", unit = u"1"]
+            [description = "Dimensionless temperature parameter (dimensionless)", unit = u"1"]
         p_sat(t), [description = "Saturation vapor pressure of water", unit = u"Pa"]
     end
 
@@ -371,7 +371,7 @@ Reference values:
         # Eq. 1.10 - Temperature parameter
         a ~ 1 - T_boil / T,
         # Eq. 1.10 - Saturation vapor pressure (in Pa)
-        p_sat ~ p_std * exp(c1*a - c2*a^2 - c3*a^3 - c4*a^4)
+        p_sat ~ p_std * exp(c1 * a - c2 * a^2 - c3 * a^3 - c4 * a^4),
     ]
 
     return System(eqs, t; name)
@@ -397,7 +397,7 @@ dimensionless ratio multiplied by 100.
 @component function RelativeHumidity(; name = :RelativeHumidity)
     @constants begin
         percent_factor = 100.0,
-        [description = "Conversion to percent (dimensionless)", unit = u"1"]
+            [description = "Conversion to percent (dimensionless)", unit = u"1"]
     end
 
     @variables begin
@@ -407,7 +407,7 @@ dimensionless ratio multiplied by 100.
     end
 
     eqs = [
-    # Eq. 1.9 - Relative humidity definition
+        # Eq. 1.9 - Relative humidity definition
         RH ~ percent_factor * p_H2O / p_sat,
     ]
 
@@ -451,7 +451,7 @@ and water vapor partial pressure.
         rh.p_H2O ~ p_H2O,
         # Output variables
         p_sat ~ sat.p_sat,
-        RH ~ rh.RH
+        RH ~ rh.RH,
     ]
 
     return System(eqs, t; systems = [sat, rh], name)
@@ -504,7 +504,7 @@ isothermal atmosphere.
         # Eq. 1.2 - Ideal gas law for density
         rho ~ M_air * p / (R * T),
         # Eq. 1.7 - Total molar concentration
-        c_total ~ p / (R * T)
+        c_total ~ p / (R * T),
     ]
 
     return System(eqs, t; name)

@@ -1,8 +1,10 @@
 using AtmosphericDynamics
 using Documenter
 
-DocMeta.setdocmeta!(AtmosphericDynamics, :DocTestSetup,
-    :(using AtmosphericDynamics); recursive = true)
+DocMeta.setdocmeta!(
+    AtmosphericDynamics, :DocTestSetup,
+    :(using AtmosphericDynamics); recursive = true
+)
 
 makedocs(;
     modules = [AtmosphericDynamics],

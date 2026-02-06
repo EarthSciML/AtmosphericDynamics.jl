@@ -33,7 +33,7 @@ to Climate Change, 2nd Edition, John Wiley & Sons, 2006, Chapter 18, Section 18.
         κ = 0.4, [description = "von Karman constant (dimensionless)", unit = u"1"]
         # Zero diffusivity for above-BL fallback (needs units for ifelse branches)
         Kzz_zero = 0.0,
-        [unit = u"m^2/s", description = "Zero diffusivity for above-BL fallback"]
+            [unit = u"m^2/s", description = "Zero diffusivity for above-BL fallback"]
     end
 
     @parameters begin
@@ -41,7 +41,7 @@ to Climate Change, 2nd Edition, John Wiley & Sons, 2006, Chapter 18, Section 18.
         u_r = 5.0, [unit = u"m/s", description = "Reference wind speed"]
         z_r = 10.0, [unit = u"m", description = "Reference height for wind profile"]
         p_wind = 0.15,
-        [description = "Power-law exponent for wind profile (dimensionless)", unit = u"1"]
+            [description = "Power-law exponent for wind profile (dimensionless)", unit = u"1"]
 
         # Boundary layer parameters
         z_i = 1000.0, [unit = u"m", description = "Mixed-layer (inversion) height"]
@@ -81,22 +81,32 @@ to Climate Change, 2nd Edition, John Wiley & Sons, 2006, Chapter 18, Section 18.
     wzi = w_star * z_i
     Kzz_unstable_piece1 = wzi * 2.5 * κ * zn^(4.0 / 3.0) * (1 - 15 * z / L_MO)^(1.0 / 4.0)
     Kzz_unstable_piece2 = wzi *
-                          (0.021 + 0.408 * zn + 1.351 * zn^2 - 4.096 * zn^3 + 2.560 * zn^4)
+        (0.021 + 0.408 * zn + 1.351 * zn^2 - 4.096 * zn^3 + 2.56 * zn^4)
     Kzz_unstable_piece3 = wzi * 0.2 * exp(6 - 10 * zn)
     Kzz_unstable_piece4 = wzi * 0.0013
 
-    Kzz_unstable = ifelse(zn < 0.05, Kzz_unstable_piece1,
-        ifelse(zn <= 0.6, Kzz_unstable_piece2,
-            ifelse(zn <= 1.1, Kzz_unstable_piece3,
-                Kzz_unstable_piece4)))
+    Kzz_unstable = ifelse(
+        zn < 0.05, Kzz_unstable_piece1,
+        ifelse(
+            zn <= 0.6, Kzz_unstable_piece2,
+            ifelse(
+                zn <= 1.1, Kzz_unstable_piece3,
+                Kzz_unstable_piece4
+            )
+        )
+    )
 
     # --- Neutral K_zz (Eq. 18.122, Myrup & Ranzieri 1976) ---
     # K_zz = κ u_* z              for z/z_i < 0.1
     # K_zz = κ u_* z (1.1 - z/z_i) for 0.1 ≤ z/z_i ≤ 1.1
     # K_zz = 0                     for z/z_i > 1.1
-    Kzz_neutral = ifelse(zn < 0.1, κ * u_star * z,
-        ifelse(zn <= 1.1, κ * u_star * z * (1.1 - zn),
-            Kzz_zero))
+    Kzz_neutral = ifelse(
+        zn < 0.1, κ * u_star * z,
+        ifelse(
+            zn <= 1.1, κ * u_star * z * (1.1 - zn),
+            Kzz_zero
+        )
+    )
 
     # --- Stable K_zz (Eq. 18.125, Businger & Arya 1974) ---
     # K_zz = κ u_* z / (0.74 + 4.7 z/L) * exp(-8fz/u_*)
@@ -108,9 +118,13 @@ to Climate Change, 2nd Edition, John Wiley & Sons, 2006, Chapter 18, Section 18.
     # If |L_MO| > 10000 m, treat as neutral (large |L| ≈ neutral)
     # Note: We compare L_MO/z_i to dimensionless thresholds to avoid unit comparison issues
     L_MO_norm = L_MO / z_i  # Normalized Monin-Obukhov length (dimensionless)
-    K_zz_expr = ifelse(abs(L_MO_norm) > 10.0, Kzz_neutral,
-        ifelse(L_MO_norm < 0, Kzz_unstable,
-            Kzz_stable))
+    K_zz_expr = ifelse(
+        abs(L_MO_norm) > 10.0, Kzz_neutral,
+        ifelse(
+            L_MO_norm < 0, Kzz_unstable,
+            Kzz_stable
+        )
+    )
 
     # --- Horizontal eddy diffusivity K_yy ---
     # Under unstable conditions (Eq. 18.128): K_yy ≈ 0.1 w_* z_i
@@ -121,10 +135,12 @@ to Climate Change, 2nd Edition, John Wiley & Sons, 2006, Chapter 18, Section 18.
     eqs = [
         u_wind ~ u_wind_expr,   # Eq. 18.118
         K_zz ~ K_zz_expr,       # Eq. 18.119–18.125
-        K_yy ~ K_yy_expr       # Eq. 18.126–18.129
+        K_yy ~ K_yy_expr,       # Eq. 18.126–18.129
     ]
 
     # Let ModelingToolkit infer unknowns and parameters automatically
-    System(eqs, t; name = name,
-        metadata = Dict(CoupleType => AtmosphericDiffusionCoupler))
+    System(
+        eqs, t; name = name,
+        metadata = Dict(CoupleType => AtmosphericDiffusionCoupler)
+    )
 end

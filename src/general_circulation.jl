@@ -68,15 +68,17 @@ u_g = sol[sys_simplified.u_g][1]  # Eastward geostrophic wind
         lat, [description = "Latitude", unit = u"rad"]
         rho = 1.225, [description = "Air density", unit = u"kg/m^3"]
         dp_dx = 0.0,
-        [description = "Pressure gradient in x (eastward) direction", unit = u"Pa/m"]
+            [description = "Pressure gradient in x (eastward) direction", unit = u"Pa/m"]
         dp_dy = 0.0,
-        [description = "Pressure gradient in y (northward) direction", unit = u"Pa/m"]
+            [description = "Pressure gradient in y (northward) direction", unit = u"Pa/m"]
         dT_dx = 0.0,
-        [
-            description = "Temperature gradient in x direction at constant pressure", unit = u"K/m"]
+            [
+                description = "Temperature gradient in x direction at constant pressure", unit = u"K/m",
+            ]
         dT_dy = 0.0,
-        [
-            description = "Temperature gradient in y direction at constant pressure", unit = u"K/m"]
+            [
+                description = "Temperature gradient in y direction at constant pressure", unit = u"K/m",
+            ]
         T = 288.15, [description = "Air temperature", unit = u"K"]
         p = 101325.0, [description = "Air pressure", unit = u"Pa"]
     end
@@ -84,16 +86,20 @@ u_g = sol[sys_simplified.u_g][1]  # Eastward geostrophic wind
     @variables begin
         f(t), [description = "Coriolis parameter", unit = u"s^-1"]
         v_tan(t),
-        [description = "Tangential speed at latitude due to Earth rotation", unit = u"m/s"]
+            [description = "Tangential speed at latitude due to Earth rotation", unit = u"m/s"]
         u_g(t), [description = "Zonal (eastward) geostrophic wind component", unit = u"m/s"]
         v_g(t),
-        [description = "Meridional (northward) geostrophic wind component", unit = u"m/s"]
+            [description = "Meridional (northward) geostrophic wind component", unit = u"m/s"]
         du_g_dz(t),
-        [description = "Thermal wind: vertical gradient of zonal geostrophic wind",
-            unit = u"s^-1"]
+            [
+                description = "Thermal wind: vertical gradient of zonal geostrophic wind",
+                unit = u"s^-1",
+            ]
         dv_g_dz(t),
-        [description = "Thermal wind: vertical gradient of meridional geostrophic wind",
-            unit = u"s^-1"]
+            [
+                description = "Thermal wind: vertical gradient of meridional geostrophic wind",
+                unit = u"s^-1",
+            ]
     end
 
     eqs = [
@@ -115,7 +121,7 @@ u_g = sol[sys_simplified.u_g][1]  # Eastward geostrophic wind
         # ∂u_g/∂z = -(g/fT)(∂T/∂y)_p
         du_g_dz ~ -(g / (f * T)) * dT_dy,
         # Similarly: ∂v_g/∂z = (g/fT)(∂T/∂x)_p
-        dv_g_dz ~ (g / (f * T)) * dT_dx
+        dv_g_dz ~ (g / (f * T)) * dT_dx,
     ]
 
     return System(eqs, t; name)
