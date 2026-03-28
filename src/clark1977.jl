@@ -53,9 +53,9 @@ Variables (outputs):
                 unit = u"J/(kg*K)",
             ]
         inv_kappa = 1004.0 / 287.0,
-            [description = "C_p/R_d = 1/κ, pressure profile exponent (dimensionless)"]
+            [description = "C_p/R_d = 1/κ, pressure profile exponent (dimensionless)", unit = u"1"]
         inv_kappa_m1 = 1004.0 / 287.0 - 1.0,
-            [description = "C_p/R_d - 1, density profile exponent (dimensionless)"]
+            [description = "C_p/R_d - 1, density profile exponent (dimensionless)", unit = u"1"]
     end
 
     @parameters begin
@@ -112,7 +112,7 @@ where:
     @variables begin
         z_s(t), [description = "Terrain surface height (Eq. 7.1)", unit = u"m"]
         dz_s_dx(t),
-            [description = "Terrain slope ∂z_s/∂x (dimensionless)"]
+            [description = "Terrain slope ∂z_s/∂x (dimensionless)", unit = u"1"]
     end
 
     eqs = [
@@ -158,21 +158,21 @@ Variables (outputs):
         H = 8000.0, [description = "Domain height", unit = u"m"]
         z_bar = 0.0, [description = "Transformed vertical coordinate", unit = u"m"]
         dz_s_dx = 0.0,
-            [description = "Terrain slope ∂z_s/∂x (dimensionless)"]
+            [description = "Terrain slope ∂z_s/∂x (dimensionless)", unit = u"1"]
         dz_s_dy = 0.0,
-            [description = "Terrain slope ∂z_s/∂y (dimensionless)"]
+            [description = "Terrain slope ∂z_s/∂y (dimensionless)", unit = u"1"]
     end
 
     @variables begin
         G_sqrt(t),
-            [description = "Jacobian G^(1/2) = 1 - z_s/H (Eq. 2.21) (dimensionless)"]
+            [description = "Jacobian G^(1/2) = 1 - z_s/H (Eq. 2.21) (dimensionless)", unit = u"1"]
         G_sqrt_G13(t),
-            [description = "Metric coefficient G^(1/2)·G^13 (Eq. 2.22) (dimensionless)"]
+            [description = "Metric coefficient G^(1/2)·G^13 (Eq. 2.22) (dimensionless)", unit = u"1"]
         G_sqrt_G23(t),
-            [description = "Metric coefficient G^(1/2)·G^23 (Eq. 2.23) (dimensionless)"]
+            [description = "Metric coefficient G^(1/2)·G^23 (Eq. 2.23) (dimensionless)", unit = u"1"]
         z_phys(t), [description = "Physical height z (inverse of Eq. 2.20)", unit = u"m"]
         ω_diag(t),
-            [description = "Diagnostic factor for ω: ω·G^(1/2) = w + G^(1/2)G^13·u + G^(1/2)G^23·v (Eq. 2.27) (dimensionless)"]
+            [description = "Diagnostic factor for ω: ω·G^(1/2) = w + G^(1/2)G^13·u + G^(1/2)G^23·v (Eq. 2.27) (dimensionless)", unit = u"1"]
     end
 
     eqs = [
@@ -212,7 +212,7 @@ The turbulent heat diffusivity is assumed equal to the eddy viscosity:
 @component function SmagorinskyTurbulence(; name = :SmagorinskyTurbulence)
     @constants begin
         k_smag = 0.25,
-            [description = "Smagorinsky constant (dimensionless)"]
+            [description = "Smagorinsky constant (dimensionless)", unit = u"1"]
         Def_ref = 1.0,
             [
                 description = "Reference deformation rate for non-dimensionalization",
