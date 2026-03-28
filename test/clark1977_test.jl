@@ -654,7 +654,7 @@ using AtmosphericDynamics
             system_names = [nameof(sys) for sys in full_system.systems]
             expected_names = [
                 :base_state, :topography, :transform, :turbulence,
-                :momentum, :mass_continuity, :thermodynamics, :pressure_diag
+                :momentum, :mass_continuity, :thermodynamics, :pressure_diag,
             ]
 
             for name in expected_names

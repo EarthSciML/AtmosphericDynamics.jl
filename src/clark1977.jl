@@ -339,14 +339,14 @@ the base state.
     end
 
     eqs = [
-        # Eq. 2.1: u-momentum equation (Coriolis term is +ρvf)
-        mom_u ~ ρ * du_dt - ρ * v * f_coriolis + dp_dx - div_τ1 + ρ_bar * u / τ_R,
+        # Eq. 2.1: u-momentum equation (Coriolis term is +ρuf)
+        mom_u ~ ρ * du_dt + ρ * u * f_coriolis + dp_dx - div_τ1 - ρ_bar * u / τ_R,
 
-        # Eq. 2.2: v-momentum equation (Coriolis term is +ρuf)
-        mom_v ~ ρ * dv_dt + ρ * u * f_coriolis + dp_dy - div_τ2 + ρ_bar * v / τ_R,
+        # Eq. 2.2: v-momentum equation (Coriolis term is +ρvf)
+        mom_v ~ ρ * dv_dt + ρ * v * f_coriolis + dp_dy - div_τ2 - ρ_bar * v / τ_R,
 
         # Eq. 2.3: w-momentum equation (no Coriolis in vertical)
-        mom_w ~ ρ * dw_dt + dp_dz + ρ_prime * g - div_τ3 + ρ * w / τ_R,
+        mom_w ~ ρ * dw_dt + dp_dz + ρ_prime * g - div_τ3 - ρ * w / τ_R,
     ]
 
     return System(eqs, t; name)
@@ -419,7 +419,7 @@ $(TYPEDSIGNATURES)
 Anelastic thermodynamics equation with turbulent heat flux from Clark (1977).
 
 Implements the first law of thermodynamics (Eq. 2.14):
-``\\bar{ρ}\\frac{dθ}{dt} = -\\frac{∂H_1}{∂x} + \\frac{∂H_2}{∂y} + \\frac{∂H_3}{∂z}``
+``\\bar{ρ}\\frac{dθ}{dt} = -\\frac{∂H_1}{∂x} - \\frac{∂H_2}{∂y} - \\frac{∂H_3}{∂z}``
 
 where ``H_i`` are the turbulent heat flux components specified by the Smagorinsky closure:
 ``H_i = \\bar{ρ}K_H(∂θ/∂x_i)`` (Eq. 2.19).
@@ -470,7 +470,7 @@ where ``H_i`` are the turbulent heat flux components specified by the Smagorinsk
         H3 ~ ρ_bar * K_H * dθ_dz,
 
         # Heat flux divergence
-        div_H ~ -dH1_dx + dH2_dy + dH3_dz,
+        div_H ~ -dH1_dx - dH2_dy - dH3_dz,
 
         # Eq. 2.14: First law of thermodynamics
         thermo_residual ~ ρ_bar * dθ_dt - div_H,
