@@ -103,14 +103,13 @@ end
 
     prob = ODEProblem(
         csys,
-        Dict(),
-        (0.0, 1.0),
         Dict(
             csys.T => T_above,
             csys.T_below => T_surface,
             csys.Δz => Δz,
             csys.p => 101325.0
-        )
+        ),
+        (0.0, 1.0)
     )
     sol = solve(prob)
 
@@ -134,10 +133,12 @@ end
 
     # Test 1: At sea level, θ = T
     prob = ODEProblem(
-        csys, Dict(), (0.0, 1.0), Dict(
+        csys,
+        Dict(
             csys.T => T,
             csys.p => p₀
-        )
+        ),
+        (0.0, 1.0)
     )
     sol = solve(prob)
     @test isapprox(sol[csys.θ][end], T, rtol = 1.0e-6)
@@ -149,10 +150,12 @@ end
     θ_expected = T_850 * (p₀ / p_850)^0.286
 
     prob2 = ODEProblem(
-        csys, Dict(), (0.0, 1.0), Dict(
+        csys,
+        Dict(
             csys.T => T_850,
             csys.p => p_850
-        )
+        ),
+        (0.0, 1.0)
     )
     sol2 = solve(prob2)
     @test isapprox(sol2[csys.θ][end], θ_expected, rtol = 0.01)
@@ -177,14 +180,13 @@ end
     T_stable = T_surface - 0.005 * Δz  # 0.5 K/100m, less than 0.976 K/100m
     prob_stable = ODEProblem(
         csys,
-        Dict(),
-        (0.0, 1.0),
         Dict(
             csys.T => T_stable,
             csys.T_below => T_surface,
             csys.Δz => Δz,
             csys.p => 101325.0
-        )
+        ),
+        (0.0, 1.0)
     )
     sol_stable = solve(prob_stable)
     # S > 0 for stable (dθ/dz > 0)
@@ -194,14 +196,13 @@ end
     T_unstable = T_surface - 0.015 * Δz  # 1.5 K/100m, more than 0.976 K/100m
     prob_unstable = ODEProblem(
         csys,
-        Dict(),
-        (0.0, 1.0),
         Dict(
             csys.T => T_unstable,
             csys.T_below => T_surface,
             csys.Δz => Δz,
             csys.p => 101325.0
-        )
+        ),
+        (0.0, 1.0)
     )
     sol_unstable = solve(prob_unstable)
     # S < 0 for unstable (dθ/dz < 0)
@@ -222,13 +223,14 @@ end
     # Test 1: Neutral conditions (very small heat flux)
     # When q_z ≈ 0, |L| should be very large
     prob_neutral = ODEProblem(
-        csys, Dict(), (0.0, 1.0),
+        csys,
         Dict(
             csys.u_star => 0.3,
             csys.q_z => 1.0e-6,  # Nearly zero heat flux
             csys.T₀ => 288.15,
             csys.ρ => 1.225
-        )
+        ),
+        (0.0, 1.0)
     )
     sol_neutral = solve(prob_neutral)
     @test abs(sol_neutral[csys.L][end]) > 1.0e6  # Very large |L| for neutral
@@ -236,13 +238,14 @@ end
     # Test 2: Unstable conditions (positive heat flux - surface heating)
     # L should be negative
     prob_unstable = ODEProblem(
-        csys, Dict(), (0.0, 1.0),
+        csys,
         Dict(
             csys.u_star => 0.4,
             csys.q_z => 100.0,  # Positive upward heat flux
             csys.T₀ => 288.15,
             csys.ρ => 1.225
-        )
+        ),
+        (0.0, 1.0)
     )
     sol_unstable = solve(prob_unstable)
     @test sol_unstable[csys.L][end] < 0  # Negative L for unstable
@@ -250,13 +253,14 @@ end
     # Test 3: Stable conditions (negative heat flux - surface cooling)
     # L should be positive
     prob_stable = ODEProblem(
-        csys, Dict(), (0.0, 1.0),
+        csys,
         Dict(
             csys.u_star => 0.3,
             csys.q_z => -50.0,  # Negative (downward) heat flux
             csys.T₀ => 288.15,
             csys.ρ => 1.225
-        )
+        ),
+        (0.0, 1.0)
     )
     sol_stable = solve(prob_stable)
     @test sol_stable[csys.L][end] > 0  # Positive L for stable
@@ -274,15 +278,14 @@ end
     # φ_m = φ_h = 1
     prob_neutral = ODEProblem(
         csys,
-        Dict(),
-        (0.0, 1.0),
         Dict(
             csys.u_star => 0.3,
             csys.q_z => 1.0e-8,  # Nearly zero heat flux gives large |L|
             csys.z => 10.0,
             csys.T₀ => 288.15,
             csys.ρ => 1.225
-        )
+        ),
+        (0.0, 1.0)
     )
     sol_neutral = solve(prob_neutral)
     @test isapprox(sol_neutral[csys.ζ][end], 0.0, atol = 1.0e-4)
@@ -293,15 +296,14 @@ end
     # φ_m = φ_h = 1 + 4.7ζ (Businger et al. 1971, Eq. 16.75)
     prob_stable = ODEProblem(
         csys,
-        Dict(),
-        (0.0, 1.0),
         Dict(
             csys.u_star => 0.2,
             csys.q_z => -50.0,
             csys.z => 10.0,
             csys.T₀ => 288.15,
             csys.ρ => 1.225
-        )
+        ),
+        (0.0, 1.0)
     )
     sol_stable = solve(prob_stable)
     ζ_stable = sol_stable[csys.ζ][end]
@@ -315,15 +317,14 @@ end
     # φ_h = (1 - 15ζ)^(-1/2)
     prob_unstable = ODEProblem(
         csys,
-        Dict(),
-        (0.0, 1.0),
         Dict(
             csys.u_star => 0.3,
             csys.q_z => 100.0,
             csys.z => 10.0,
             csys.T₀ => 288.15,
             csys.ρ => 1.225
-        )
+        ),
+        (0.0, 1.0)
     )
     sol_unstable = solve(prob_unstable)
     ζ_unstable = sol_unstable[csys.ζ][end]
@@ -355,8 +356,6 @@ end
 
     prob = ODEProblem(
         csys,
-        Dict(),
-        (0.0, 1.0),
         Dict(
             csys.u_star => u_star,
             csys.z₀ => z₀,
@@ -364,7 +363,8 @@ end
             csys.q_z => 1.0e-8,  # Nearly neutral
             csys.T₀ => 288.15,
             csys.ρ => 1.225
-        )
+        ),
+        (0.0, 1.0)
     )
     sol = solve(prob)
 
@@ -379,8 +379,6 @@ end
 
     prob_wangara = ODEProblem(
         csys,
-        Dict(),
-        (0.0, 1.0),
         Dict(
             csys.u_star => u_star_wangara,
             csys.z₀ => z₀_wangara,
@@ -388,7 +386,8 @@ end
             csys.q_z => 1.0e-8,  # Neutral
             csys.T₀ => 288.15,
             csys.ρ => 1.225
-        )
+        ),
+        (0.0, 1.0)
     )
     sol_wangara = solve(prob_wangara)
     @test isapprox(sol_wangara[csys.ū][end], ū_wangara_expected, rtol = 0.05)
@@ -409,15 +408,14 @@ end
     # Test 1: Very unstable conditions should give class near 1 (A)
     prob_A = ODEProblem(
         csys,
-        Dict(),
-        (0.0, 1.0),
         Dict(
             csys.u_star => 0.5,
             csys.q_z => 300.0,  # Strong upward heat flux
             csys.z₀ => 0.1,
             csys.T₀ => 300.0,
             csys.ρ => 1.225
-        )
+        ),
+        (0.0, 1.0)
     )
     sol_A = solve(prob_A)
     @test sol_A[csys.L][end] < 0  # Unstable has negative L
@@ -426,15 +424,14 @@ end
     # Test 2: Very stable conditions should give class near 6 (F)
     prob_F = ODEProblem(
         csys,
-        Dict(),
-        (0.0, 1.0),
         Dict(
             csys.u_star => 0.2,
             csys.q_z => -100.0,  # Strong downward heat flux
             csys.z₀ => 0.1,
             csys.T₀ => 280.0,
             csys.ρ => 1.225
-        )
+        ),
+        (0.0, 1.0)
     )
     sol_F = solve(prob_F)
     @test sol_F[csys.L][end] > 0  # Stable has positive L
@@ -453,8 +450,6 @@ end
     # Wind profile becomes purely logarithmic
     prob_neutral = ODEProblem(
         csys,
-        Dict(),
-        (0.0, 1.0),
         Dict(
             csys.u_star => 0.3,
             csys.q_z => 1.0e-10,  # Essentially zero heat flux
@@ -462,7 +457,8 @@ end
             csys.z₀ => 0.1,
             csys.T₀ => 288.15,
             csys.ρ => 1.225
-        )
+        ),
+        (0.0, 1.0)
     )
     sol_neutral = solve(prob_neutral)
     @test isapprox(sol_neutral[csys.ψ_m][end], 0.0, atol = 0.1)
@@ -473,8 +469,6 @@ end
 
     prob_low = ODEProblem(
         csys,
-        Dict(),
-        (0.0, 1.0),
         Dict(
             csys.u_star => 0.3,
             csys.q_z => 1.0e-8,
@@ -482,14 +476,13 @@ end
             csys.z₀ => 0.1,
             csys.T₀ => 288.15,
             csys.ρ => 1.225
-        )
+        ),
+        (0.0, 1.0)
     )
     sol_low = solve(prob_low)
 
     prob_high = ODEProblem(
         csys,
-        Dict(),
-        (0.0, 1.0),
         Dict(
             csys.u_star => 0.3,
             csys.q_z => 1.0e-8,
@@ -497,7 +490,8 @@ end
             csys.z₀ => 0.1,
             csys.T₀ => 288.15,
             csys.ρ => 1.225
-        )
+        ),
+        (0.0, 1.0)
     )
     sol_high = solve(prob_high)
 
@@ -514,10 +508,12 @@ end
 
     # Test 1: Potential temperature is always positive
     prob = ODEProblem(
-        csys, Dict(), (0.0, 1.0), Dict(
+        csys,
+        Dict(
             csys.T => 200.0,  # Cold temperature
             csys.p => 50000.0  # Low pressure
-        )
+        ),
+        (0.0, 1.0)
     )
     sol = solve(prob)
     @test sol[csys.θ][end] > 0
@@ -525,8 +521,6 @@ end
     # Test 2: Wind speed should be non-negative for typical conditions
     prob2 = ODEProblem(
         csys,
-        Dict(),
-        (0.0, 1.0),
         Dict(
             csys.u_star => 0.5,
             csys.z => 10.0,
@@ -534,7 +528,8 @@ end
             csys.q_z => 50.0,
             csys.T₀ => 288.15,
             csys.ρ => 1.225
-        )
+        ),
+        (0.0, 1.0)
     )
     sol2 = solve(prob2)
     @test sol2[csys.ū][end] > 0
@@ -545,15 +540,14 @@ end
 
     prob3 = ODEProblem(
         csys_surf,
-        Dict(),
-        (0.0, 1.0),
         Dict(
             csys_surf.u_star => 0.3,
             csys_surf.z => 10.0,
             csys_surf.q_z => 100.0,
             csys_surf.T₀ => 288.15,
             csys_surf.ρ => 1.225
-        )
+        ),
+        (0.0, 1.0)
     )
     sol3 = solve(prob3)
     @test sol3[csys_surf.φ_m][end] > 0

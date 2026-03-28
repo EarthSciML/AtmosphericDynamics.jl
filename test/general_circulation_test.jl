@@ -44,7 +44,7 @@ end
     ]
 
     for (lat_rad, expected_f) in test_cases
-        prob = ODEProblem(sys_c, [], (0.0, 1.0), [sys_c.lat => lat_rad])
+        prob = ODEProblem(sys_c, Dict(sys_c.lat => lat_rad), (0.0, 1.0))
         sol = solve(prob, saveat = [0.0])
         computed_f = sol[sys_c.f][1]
         @test isapprox(computed_f, expected_f, rtol = 1.0e-3)
@@ -70,7 +70,7 @@ end
     ]
 
     for (lat_rad, expected_v) in test_cases
-        prob = ODEProblem(sys_c, [], (0.0, 1.0), [sys_c.lat => lat_rad])
+        prob = ODEProblem(sys_c, Dict(sys_c.lat => lat_rad), (0.0, 1.0))
         sol = solve(prob, saveat = [0.0])
         computed_v_tan = sol[sys_c.v_tan][1]
         # Use atol for comparison when expected is zero (e.g., at the pole)
@@ -99,13 +99,14 @@ end
     f_40N = 2 * Omega * sin(lat_40N)
 
     prob = ODEProblem(
-        sys_c, [], (0.0, 1.0),
-        [
+        sys_c,
+        Dict(
             sys_c.lat => lat_40N,
             sys_c.dp_dy => dp_dy,
             sys_c.dp_dx => 0.0,
             sys_c.rho => rho,
-        ]
+        ),
+        (0.0, 1.0)
     )
     sol = solve(prob, saveat = [0.0])
 
@@ -142,13 +143,14 @@ end
     lat_rad = asin(f_test / (2 * Omega))
 
     prob = ODEProblem(
-        sys_c, [], (0.0, 1.0),
-        [
+        sys_c,
+        Dict(
             sys_c.lat => lat_rad,
             sys_c.dT_dx => dT_dx,
             sys_c.dT_dy => dT_dy,
             sys_c.T => T,
-        ]
+        ),
+        (0.0, 1.0)
     )
     sol = solve(prob, saveat = [0.0])
 
@@ -171,12 +173,12 @@ end
 
     # Test that Coriolis parameter has correct sign in both hemispheres
     # Northern Hemisphere: f > 0
-    prob_NH = ODEProblem(sys_c, [], (0.0, 1.0), [sys_c.lat => deg2rad(45.0)])
+    prob_NH = ODEProblem(sys_c, Dict(sys_c.lat => deg2rad(45.0)), (0.0, 1.0))
     sol_NH = solve(prob_NH, saveat = [0.0])
     @test sol_NH[sys_c.f][1] > 0
 
     # Southern Hemisphere: f < 0
-    prob_SH = ODEProblem(sys_c, [], (0.0, 1.0), [sys_c.lat => deg2rad(-45.0)])
+    prob_SH = ODEProblem(sys_c, Dict(sys_c.lat => deg2rad(-45.0)), (0.0, 1.0))
     sol_SH = solve(prob_SH, saveat = [0.0])
     @test sol_SH[sys_c.f][1] < 0
 
@@ -195,26 +197,28 @@ end
 
     # Case 1: Pressure decreases northward -> eastward (westerly) wind
     prob1 = ODEProblem(
-        sys_c, [], (0.0, 1.0),
-        [
+        sys_c,
+        Dict(
             sys_c.lat => lat_45N,
             sys_c.dp_dy => -0.001,  # Pressure decreases northward
             sys_c.dp_dx => 0.0,
             sys_c.rho => 1.0,
-        ]
+        ),
+        (0.0, 1.0)
     )
     sol1 = solve(prob1, saveat = [0.0])
     @test sol1[sys_c.u_g][1] > 0  # Westerly (from west, blowing east)
 
     # Case 2: Pressure decreases eastward -> northward wind
     prob2 = ODEProblem(
-        sys_c, [], (0.0, 1.0),
-        [
+        sys_c,
+        Dict(
             sys_c.lat => lat_45N,
             sys_c.dp_dy => 0.0,
             sys_c.dp_dx => -0.001,  # Pressure decreases eastward
             sys_c.rho => 1.0,
-        ]
+        ),
+        (0.0, 1.0)
     )
     sol2 = solve(prob2, saveat = [0.0])
     @test sol2[sys_c.v_g][1] < 0  # Southerly wind (from south, blowing north would be positive v)

@@ -159,7 +159,7 @@ end
 
     # Time span: 100 years in seconds
     tspan = (0.0, 100.0 * yr_to_s)
-    prob = ODEProblem(sys_c, merge(Dict(), Dict(sys_c.Ff => Ff_value)), tspan)
+    prob = ODEProblem(sys_c, Dict(sys_c.Ff => Ff_value), tspan)
     sol = solve(prob)
     @test sol.retcode == SciMLBase.ReturnCode.Success
 
@@ -195,7 +195,7 @@ end
     # Test that atmospheric CO2 increases with emissions
     # Time span: 50 years in seconds
     tspan = (0.0, 50.0 * yr_to_s)
-    prob = ODEProblem(sys_c, merge(Dict(), Dict(sys_c.Ff => Ff_value)), tspan)
+    prob = ODEProblem(sys_c, Dict(sys_c.Ff => Ff_value), tspan)
     sol = solve(prob)
     @test sol.retcode == SciMLBase.ReturnCode.Success
 
@@ -333,7 +333,7 @@ end
         sys_c.k_S_SH => k_S_removal
     )
 
-    prob = NonlinearProblem(sys_c, u0, p)
+    prob = NonlinearProblem(sys_c, merge(u0, p))
     sol = solve(prob)
     @test sol.retcode == SciMLBase.ReturnCode.Success
 

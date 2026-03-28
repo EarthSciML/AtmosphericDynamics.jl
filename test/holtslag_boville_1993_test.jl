@@ -892,8 +892,12 @@ end
 @testitem "NonlocalABL constants match paper" setup = [HoltslagBoville1993Setup] tags = [:holtslag] begin
     nl = HoltslagBovilleNonlocalABL()
 
-    defaults = ModelingToolkit.get_defaults(nl)
-    const_names = Dict(string(k) => v for (k, v) in defaults)
+    # Build a dict of parameter/constant defaults from the system
+    ps = parameters(nl)
+    const_names = Dict(
+        string(p) => ModelingToolkit.getdefault(p)
+            for p in ps if ModelingToolkit.hasdefault(p)
+    )
 
     # κ = 0.4 (von Karman constant)
     κ_key = findfirst(k -> contains(k, "κ"), collect(keys(const_names)))

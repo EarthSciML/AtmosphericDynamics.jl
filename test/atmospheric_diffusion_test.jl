@@ -38,7 +38,7 @@ end
     # With defaults: u_r=5, z_r=10, p_wind=0.15
 
     # At reference height, wind should equal reference speed
-    sol = solve(remake(prob; p = Dict(ssys.z => 10.0)))
+    sol = solve(NonlinearProblem(ssys, Dict(ssys.z => 10.0)))
     @test sol[ssys.u_wind] ≈ 5.0 rtol = 1.0e-6
 
     # At z=100m with p=0.15: u = 5 * (100/10)^0.15 = 5 * 10^0.15
@@ -46,7 +46,7 @@ end
     @test sol100[ssys.u_wind] ≈ 5.0 * 10.0^0.15 rtol = 1.0e-6
 
     # At z=50m: u = 5 * (50/10)^0.15 = 5 * 5^0.15
-    sol50 = solve(remake(prob; p = Dict(ssys.z => 50.0)))
+    sol50 = solve(NonlinearProblem(ssys, Dict(ssys.z => 50.0)))
     @test sol50[ssys.u_wind] ≈ 5.0 * 5.0^0.15 rtol = 1.0e-6
 end
 
@@ -66,7 +66,7 @@ end
     expected_norm = 2.5 * κ * zn^(4 / 3) * (1 - 15 * z_test / L_MO)^(1 / 4)
     expected_Kzz = w_star * z_i * expected_norm
 
-    sol = solve(remake(prob; p = Dict(ssys.z => z_test)))
+    sol = solve(NonlinearProblem(ssys, Dict(ssys.z => z_test)))
     @test sol[ssys.K_zz] ≈ expected_Kzz rtol = 1.0e-4
 
     # Piece 2: 0.05 ≤ z/z_i ≤ 0.6, test at z=300m (z/z_i = 0.3)
@@ -75,7 +75,7 @@ end
     expected_norm2 = 0.021 + 0.408 * zn2 + 1.351 * zn2^2 - 4.096 * zn2^3 + 2.56 * zn2^4
     expected_Kzz2 = w_star * z_i * expected_norm2
 
-    sol2 = solve(remake(prob; p = Dict(ssys.z => z_test2)))
+    sol2 = solve(NonlinearProblem(ssys, Dict(ssys.z => z_test2)))
     @test sol2[ssys.K_zz] ≈ expected_Kzz2 rtol = 1.0e-4
 
     # Piece 3: 0.6 < z/z_i ≤ 1.1, test at z=800m (z/z_i = 0.8)
@@ -84,14 +84,14 @@ end
     expected_norm3 = 0.2 * exp(6 - 10 * zn3)
     expected_Kzz3 = w_star * z_i * expected_norm3
 
-    sol3 = solve(remake(prob; p = Dict(ssys.z => z_test3)))
+    sol3 = solve(NonlinearProblem(ssys, Dict(ssys.z => z_test3)))
     @test sol3[ssys.K_zz] ≈ expected_Kzz3 rtol = 1.0e-4
 
     # Piece 4: z/z_i > 1.1, test at z=1200m (z/z_i = 1.2)
     z_test4 = 1200.0
     expected_Kzz4 = w_star * z_i * 0.0013
 
-    sol4 = solve(remake(prob; p = Dict(ssys.z => z_test4)))
+    sol4 = solve(NonlinearProblem(ssys, Dict(ssys.z => z_test4)))
     @test sol4[ssys.K_zz] ≈ expected_Kzz4 rtol = 1.0e-4
 end
 
@@ -105,7 +105,7 @@ end
     z_test = 50.0
     expected = κ * u_star * z_test
 
-    sol = solve(remake(prob; p = Dict(ssys.z => z_test, ssys.L_MO => 1.0e6)))
+    sol = solve(NonlinearProblem(ssys, Dict(ssys.z => z_test, ssys.L_MO => 1.0e6)))
     @test sol[ssys.K_zz] ≈ expected rtol = 1.0e-4
 
     # 0.1 ≤ z/z_i ≤ 1.1: K_zz = κ u_* z (1.1 - z/z_i)
@@ -113,11 +113,11 @@ end
     zn2 = z_test2 / z_i
     expected2 = κ * u_star * z_test2 * (1.1 - zn2)
 
-    sol2 = solve(remake(prob; p = Dict(ssys.z => z_test2, ssys.L_MO => 1.0e6)))
+    sol2 = solve(NonlinearProblem(ssys, Dict(ssys.z => z_test2, ssys.L_MO => 1.0e6)))
     @test sol2[ssys.K_zz] ≈ expected2 rtol = 1.0e-4
 
     # z/z_i > 1.1: K_zz ≈ 0
-    sol3 = solve(remake(prob; p = Dict(ssys.z => 1200.0, ssys.L_MO => 1.0e6)))
+    sol3 = solve(NonlinearProblem(ssys, Dict(ssys.z => 1200.0, ssys.L_MO => 1.0e6)))
     @test sol3[ssys.K_zz] ≈ 0.0 atol = 1.0e-6
 end
 
@@ -133,14 +133,14 @@ end
     expected = κ * u_star * z_test / (0.74 + 4.7 * z_test / L_MO) *
         exp(-8 * f_cor * z_test / u_star)
 
-    sol = solve(remake(prob; p = Dict(ssys.z => z_test, ssys.L_MO => L_MO)))
+    sol = solve(NonlinearProblem(ssys, Dict(ssys.z => z_test, ssys.L_MO => L_MO)))
     @test sol[ssys.K_zz] ≈ expected rtol = 1.0e-4
 
     z_test2 = 200.0
     expected2 = κ * u_star * z_test2 / (0.74 + 4.7 * z_test2 / L_MO) *
         exp(-8 * f_cor * z_test2 / u_star)
 
-    sol2 = solve(remake(prob; p = Dict(ssys.z => z_test2, ssys.L_MO => L_MO)))
+    sol2 = solve(NonlinearProblem(ssys, Dict(ssys.z => z_test2, ssys.L_MO => L_MO)))
     @test sol2[ssys.K_zz] ≈ expected2 rtol = 1.0e-4
 end
 
@@ -155,27 +155,27 @@ end
     # Unstable: K_yy = 0.1 * w_star * z_i (independent of z)
     expected_Kyy = 0.1 * w_star * z_i
 
-    sol = solve(remake(prob; p = Dict(ssys.z => 200.0)))
+    sol = solve(NonlinearProblem(ssys, Dict(ssys.z => 200.0)))
     @test sol[ssys.K_yy] ≈ expected_Kyy rtol = 1.0e-4
 
     # Under stable conditions, K_yy = K_zz
-    sol_stable = solve(remake(prob; p = Dict(ssys.z => 50.0, ssys.L_MO => 200.0)))
+    sol_stable = solve(NonlinearProblem(ssys, Dict(ssys.z => 50.0, ssys.L_MO => 200.0)))
     @test sol_stable[ssys.K_yy] ≈ sol_stable[ssys.K_zz] rtol = 1.0e-6
 end
 
 @testitem "Qualitative Properties" setup = [AtmDiffSetup] tags = [:atmdiff] begin
     # Wind speed should increase with height (power-law with p > 0)
-    sol_low = solve(remake(prob; p = Dict(ssys.z => 10.0)))
-    sol_high = solve(remake(prob; p = Dict(ssys.z => 100.0)))
+    sol_low = solve(NonlinearProblem(ssys, Dict(ssys.z => 10.0)))
+    sol_high = solve(NonlinearProblem(ssys, Dict(ssys.z => 100.0)))
     @test sol_high[ssys.u_wind] > sol_low[ssys.u_wind]
 
     # K_zz should be positive at typical heights for all stability regimes
     for L_MO_val in [-100.0, 1.0e6, 200.0]
-        sol = solve(remake(prob; p = Dict(ssys.z => 100.0, ssys.L_MO => L_MO_val)))
+        sol = solve(NonlinearProblem(ssys, Dict(ssys.z => 100.0, ssys.L_MO => L_MO_val)))
         @test sol[ssys.K_zz] > 0
     end
 
     # K_yy should be positive
-    sol = solve(remake(prob; p = Dict(ssys.z => 100.0)))
+    sol = solve(NonlinearProblem(ssys, Dict(ssys.z => 100.0)))
     @test sol[ssys.K_yy] > 0
 end
