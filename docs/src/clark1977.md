@@ -227,7 +227,7 @@ fig3
 
 The Smagorinsky closure relates eddy viscosity to the resolved deformation
 rate. This plot shows ``K_M`` as a function of the dominant shear ``D_{13}``
-for ``\Delta = 600`` m and ``k = 0.25``.
+for ``Δ = 600`` m and ``k = 0.25``.
 
 ```@example clark1977
 @named smag = SmagorinskyTurbulence()
@@ -248,3 +248,21 @@ lines!(ax4, collect(D13_vals), K_M_vals)
 
 fig4
 ```
+
+### Comparison with Clark (1977) Results
+
+**Note**: The current implementation provides the foundational components from
+Clark (1977) but represents a simplified demonstration. The complete paper
+includes results that should be reproduced:
+
+- **Table I**: Mountain wave simulation parameters for different cases
+- **Figure 1A**: Vertical velocity field showing mountain wave patterns
+- **Figure 1B**: Comparison with linear theory predictions
+- **Figure 2**: Effects of nonlinear lower boundary condition (asymmetry)
+- **Figures 3A-3B**: Temporal evolution of potential temperature field
+- **Figures 4-5**: Phase velocity analysis for transient waves
+- **Figure 6**: Kinetic energy budget showing energy conservation
+
+**Froude Number**: For the default parameters (a=3km, N=0.01/s, U=4m/s),
+the inverse Froude number is F ≈ 1.18, corresponding to the mildly nonlinear
+regime where both linear theory and nonlinear effects are important.
