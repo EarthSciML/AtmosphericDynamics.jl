@@ -20,7 +20,6 @@ ModelingToolkit = "11"
 NonlinearSolve = "4.10"
 OrdinaryDiffEqDefault = "1.10"
 SciMLBase = "2.130"
-TestItemRunner = "1.1.0"
 julia = "1.10"
 
 [extras]
@@ -29,8 +28,7 @@ NonlinearSolve = "8913a72c-1f9b-4ce2-8d82-65094dcecaec"
 OrdinaryDiffEqDefault = "50262376-6c5a-4cf5-baba-aaf4f84d72d7"
 SciMLBase = "0bca4576-84f4-4d90-8ffe-ffa030f20462"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
-TestItemRunner = "f8b46487-2199-4994-9208-9a1283c18c0a"
 DynamicQuantities = "06fc5a27-2a28-4c7c-a15d-362465fb6821"
 
 [targets]
-test = ["MethodOfLines", "NonlinearSolve", "OrdinaryDiffEqDefault", "SciMLBase", "Test", "TestItemRunner", "DynamicQuantities"]
+test = ["MethodOfLines", "NonlinearSolve", "OrdinaryDiffEqDefault", "SciMLBase", "Test", "DynamicQuantities"]

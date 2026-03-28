@@ -15,4 +15,8 @@ include("global_cycles.jl")
 include("holtslag_boville_1993.jl")
 include("clark1977.jl")
 
+# Exports from clark1977.jl
+export IsentropicBaseState, WitchOfAgnesi, TerrainFollowingTransform
+export SmagorinskyTurbulence, MountainWave2D
+
 end # module

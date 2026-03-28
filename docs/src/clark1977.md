@@ -35,7 +35,8 @@ The base state assumes constant potential temperature ``\bar{\theta}(z) = \Theta
 and derives pressure, temperature, and density profiles in hydrostatic balance.
 
 ```@example clark1977
-using DataFrames, ModelingToolkit, ModelingToolkit: mtkcompile, Symbolics, DynamicQuantities
+using DataFrames, ModelingToolkit, ModelingToolkit: mtkcompile, Symbolics, @named
+using DynamicQuantities
 using AtmosphericDynamics
 
 @named bs = IsentropicBaseState()
