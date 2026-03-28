@@ -249,20 +249,54 @@ lines!(ax4, collect(D13_vals), K_M_vals)
 fig4
 ```
 
-### Comparison with Clark (1977) Results
+### Validation Against Clark (1977) Results
 
-**Note**: The current implementation provides the foundational components from
-Clark (1977) but represents a simplified demonstration. The complete paper
-includes results that should be reproduced:
+**Parameter Validation**: The implementation uses parameters consistent with Clark's Table I:
 
-- **Table I**: Mountain wave simulation parameters for different cases
-- **Figure 1A**: Vertical velocity field showing mountain wave patterns
-- **Figure 1B**: Comparison with linear theory predictions
-- **Figure 2**: Effects of nonlinear lower boundary condition (asymmetry)
-- **Figures 3A-3B**: Temporal evolution of potential temperature field
-- **Figures 4-5**: Phase velocity analysis for transient waves
-- **Figure 6**: Kinetic energy budget showing energy conservation
+```@example clark1977
+# Table I parameters (Paper values)
+println("Grid resolution: Δx = 600 m (Table I)")
+println("Mountain half-width: a = 3 km (all cases)")
+println("Mountain heights: h = 100 m (cases 14,18), h = 1 km (cases 15-17,19-22)")
+println("Atmospheric stability: dθ/dz = 3 K/km (Eq. 7.2)")
+println("Mean flow: U₀ = 4 m/s (Eq. 7.3)")
 
-**Froude Number**: For the default parameters (a=3km, N=0.01/s, U=4m/s),
-the inverse Froude number is F ≈ 1.18, corresponding to the mildly nonlinear
-regime where both linear theory and nonlinear effects are important.
+# Derived parameters
+N_squared = 9.81 / 300.0 * 3.0 / 1000.0  # From stability
+N_val = sqrt(N_squared)
+F_inverse = 3000.0 * N_val / (2π * 4.0)   # Froude number (Eq. 7.5)
+
+println("\nDerived quantities:")
+println("Brunt-Väisälä frequency: N = $(round(N_val, digits=4)) s⁻¹")
+println("Inverse Froude number: F = $(round(F_inverse, digits=2))")
+println("Wave launching period: T = 2πa/(U₀F) = $(round(2π*3000.0/(4.0*F_inverse), digits=0)) s")
+```
+
+**Physical Regime**: The inverse Froude number F ≈ 1.18 places this in the mildly nonlinear
+regime where both linear theory predictions and nonlinear effects are important.
+Clark notes that linear theory predicts the vertical wavelength accurately (~7% error)
+but underestimates the amplitude due to nonlinear lower boundary effects.
+
+**Limitations of Current Implementation**:
+
+The current implementation provides foundational components but represents a simplified
+demonstration of Clark's full model. Missing elements that should be added include:
+
+- **Complete nonlinear equations**: Full momentum equations (2.1-2.3) with Reynolds stress
+- **Anelastic mass continuity**: Proper density-weighted divergence (Eq. 2.4)
+- **Diagnostic pressure equation**: The elliptic solver for pressure (Eqs. 4.1-4.2)
+- **Rayleigh friction**: Height-dependent damping (τᵣ = 800→100 s)
+- **Numerical grid**: Staggered finite differences (Section 3)
+- **Boundary condition details**: Full stress tensor formulation (Eqs. 3.32-3.46)
+
+**Expected Results for Full Implementation**:
+
+With the complete model, one should reproduce:
+- **Vertical velocity patterns** (Fig. 1A): Lee wave structure with phase lines
+- **Linear theory comparison** (Fig. 1B): ~7% wavelength agreement
+- **Asymmetric θ fields** (Fig. 2): Nonlinear boundary effects
+- **Energy conservation** (Fig. 6): Kinetic energy budget closure
+- **Wave drag values**: D_w ≈ -305 kg s⁻² for h=1km case (Table I results)
+
+For quantitative validation, the wave drag coefficient should match Clark's computed
+values when the full terrain-following equations and boundary conditions are implemented.

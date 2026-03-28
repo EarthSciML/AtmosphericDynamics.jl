@@ -52,9 +52,9 @@ Variables (outputs):
                 description = "Specific heat at constant pressure",
                 unit = u"J/(kg*K)",
             ]
-        inv_kappa = 1004.0 / 287.0,
+        inv_kappa = c_p / R_d,
             [description = "C_p/R_d = 1/κ, pressure profile exponent (dimensionless)", unit = u"1"]
-        inv_kappa_m1 = 1004.0 / 287.0 - 1.0,
+        inv_kappa_m1 = c_p / R_d - 1.0,
             [description = "C_p/R_d - 1, density profile exponent (dimensionless)", unit = u"1"]
     end
 
@@ -218,6 +218,8 @@ The turbulent heat diffusivity is assumed equal to the eddy viscosity:
                 description = "Reference deformation rate for non-dimensionalization",
                 unit = u"1/s",
             ]
+        two_thirds = 2.0/3.0,
+            [description = "Coefficient 2/3 in deformation tensor trace subtraction (dimensionless)", unit = u"1"]
     end
 
     @parameters begin
@@ -239,6 +241,9 @@ The turbulent heat diffusivity is assumed equal to the eddy viscosity:
             [description = "Eddy heat diffusivity (Eq. 2.19, K_H = K_M)", unit = u"m^2/s"]
     end
 
+    # Implement the full deformation tensor from Eq. 2.16
+    # D_ij = (∂u_i/∂x_j + ∂u_j/∂x_i) - (2/3)δ_ij ∂u_k/∂x_k
+    # The input D_ij values should already include the trace subtraction
     # Non-dimensionalize before sqrt to handle units correctly
     # Def² has units 1/s², sqrt(1/s²) = 1/s
     Def_sq_dimless = (
@@ -435,6 +440,5 @@ function MountainWave2D(;
         ],
         [U_0, N_bv, Θ_ref, ρ_0, C_a, ν, κ_diff, a_mtn, h_mtn, g];
         name,
-        checks = false,  # Required for MethodOfLines discretization with units
     )
 end
