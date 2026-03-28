@@ -1,5 +1,3 @@
-using Test
-using AtmosphericDynamics
+using TestItemRunner
 
-# Include all test files
-include("clark1977_test.jl")
+@run_package_tests

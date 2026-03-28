@@ -339,14 +339,14 @@ the base state.
     end
 
     eqs = [
-        # Eq. 2.1: u-momentum equation (Coriolis term is +ρuf)
-        mom_u ~ ρ * du_dt + ρ * u * f_coriolis + dp_dx - div_τ1 - ρ_bar * u / τ_R,
+        # Eq. 2.1: u-momentum equation (Coriolis term is +ρ̃uf, using base-state density consistently)
+        mom_u ~ ρ_bar * du_dt + ρ_bar * u * f_coriolis + dp_dx - div_τ1 - ρ_bar * u / τ_R,
 
-        # Eq. 2.2: v-momentum equation (Coriolis term is +ρvf)
-        mom_v ~ ρ * dv_dt + ρ * v * f_coriolis + dp_dy - div_τ2 - ρ_bar * v / τ_R,
+        # Eq. 2.2: v-momentum equation (Coriolis term is +ρ̃vf, using base-state density consistently)
+        mom_v ~ ρ_bar * dv_dt + ρ_bar * v * f_coriolis + dp_dy - div_τ2 - ρ_bar * v / τ_R,
 
-        # Eq. 2.3: w-momentum equation (no Coriolis in vertical)
-        mom_w ~ ρ * dw_dt + dp_dz + ρ_prime * g - div_τ3 - ρ * w / τ_R,
+        # Eq. 2.3: w-momentum equation (no Coriolis in vertical, using base-state density for w terms)
+        mom_w ~ ρ_bar * dw_dt + dp_dz + ρ_prime * g - div_τ3 - ρ_bar * w / τ_R,
     ]
 
     return System(eqs, t; name)
