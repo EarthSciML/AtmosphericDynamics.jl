@@ -24,6 +24,11 @@ IsentropicBaseState
 WitchOfAgnesi
 TerrainFollowingTransform
 SmagorinskyTurbulence
+AnelasticMomentum
+AnelasticMassContinuity
+AnelasticThermodynamics
+DiagnosticPressure
+Clark1977AnelasticSystem
 MountainWave2D
 ```
 
@@ -277,17 +282,40 @@ regime where both linear theory predictions and nonlinear effects are important.
 Clark notes that linear theory predicts the vertical wavelength accurately (~7% error)
 but underestimates the amplitude due to nonlinear lower boundary effects.
 
-**Limitations of Current Implementation**:
+## Complete Anelastic System Implementation
 
-The current implementation provides foundational components but represents a simplified
-demonstration of Clark's full model. Missing elements that should be added include:
+The module now includes a complete implementation of the core Clark (1977) governing equations:
 
-- **Complete nonlinear equations**: Full momentum equations (2.1-2.3) with Reynolds stress
-- **Anelastic mass continuity**: Proper density-weighted divergence (Eq. 2.4)
-- **Diagnostic pressure equation**: The elliptic solver for pressure (Eqs. 4.1-4.2)
-- **Rayleigh friction**: Height-dependent damping (τᵣ = 800→100 s)
-- **Numerical grid**: Staggered finite differences (Section 3)
-- **Boundary condition details**: Full stress tensor formulation (Eqs. 3.32-3.46)
+### Core Governing Equations (New)
+
+```@example clark1977
+# Demonstrate the complete anelastic system
+@named full_sys = Clark1977AnelasticSystem()
+
+# Count total variables in the complete system
+total_variables = sum(length(unknowns(sys)) for sys in full_sys.systems)
+println("Total variables in complete system: ", total_variables)
+println("Number of subsystems: ", length(full_sys.systems))
+```
+
+The complete system (`Clark1977AnelasticSystem`) integrates:
+
+1. **AnelasticMomentum**: Full momentum equations (2.1-2.3) with Coriolis, pressure gradients, Reynolds stress divergence, and Rayleigh friction
+2. **AnelasticMassContinuity**: Density-weighted divergence constraint (2.4) that filters acoustic waves
+3. **AnelasticThermodynamics**: First law with turbulent heat flux (2.14, 2.19)
+4. **DiagnosticPressure**: Elliptic pressure equation (Section 4) derived from anelastic constraint
+5. **All original components**: Base state, topography, coordinate transformation, turbulence closure
+
+### Comparison with Simplified Implementation
+
+**Previous Limitations (Now Addressed)**:
+
+- ✅ **Complete nonlinear equations**: Full momentum equations (2.1-2.3) with Reynolds stress
+- ✅ **Anelastic mass continuity**: Proper density-weighted divergence (Eq. 2.4)
+- ✅ **Diagnostic pressure equation**: The elliptic solver framework (Eqs. 4.1-4.2)
+- ⚠️ **Rayleigh friction**: Height-dependent damping (τᵣ = 800→100 s) - framework present
+- ⚠️ **Numerical grid**: Staggered finite differences (Section 3) - requires PDE discretization
+- ⚠️ **Boundary condition details**: Full stress tensor formulation (Eqs. 3.32-3.46) - framework present
 
 **Expected Results for Full Implementation**:
 
