@@ -1,3 +1,3 @@
-using TestItemRunner
+using Test
 
-@run_package_tests
+include("clark1977_test.jl")
