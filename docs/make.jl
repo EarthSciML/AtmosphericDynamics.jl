@@ -26,6 +26,7 @@ makedocs(;
         "Atmospheric Diffusion" => "atmospheric_diffusion.md",
         "Global Cycles" => "global_cycles.md",
         "Holtslag & Boville 1993" => "holtslag_boville_1993.md",
+        "Clark 1977" => "clark1977.md",
     ]
 )
 
