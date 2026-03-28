@@ -330,15 +330,15 @@ function MountainWave2D(;
 
     # Physical parameters (all SI units)
     @parameters begin
-        U_0, [description = "Mean flow velocity [m/s] (Eq. 7.3)"]
-        N_bv, [description = "Brunt-Väisälä frequency [1/s]"]
-        Θ_ref, [description = "Reference potential temperature [K]"]
-        ρ_0, [description = "Reference density [kg/m³]"]
-        C_a, [description = "Pseudo-compressible acoustic speed [m/s]"]
-        ν, [description = "Eddy viscosity [m²/s]"]
-        κ_diff, [description = "Eddy thermal diffusivity [m²/s]"]
-        a_mtn, [description = "Mountain half-width [m] (Eq. 7.1)"]
-        h_mtn, [description = "Mountain height [m] (Eq. 7.1)"]
+        U_0 = U_0_val, [description = "Mean flow velocity [m/s] (Eq. 7.3)"]
+        N_bv = N_val, [description = "Brunt-Väisälä frequency [1/s]"]
+        Θ_ref = Θ_val, [description = "Reference potential temperature [K]"]
+        ρ_0 = ρ_0_val, [description = "Reference density [kg/m³]"]
+        C_a = C_a_val, [description = "Pseudo-compressible acoustic speed [m/s]"]
+        ν = ν_val, [description = "Eddy viscosity [m²/s]"]
+        κ_diff = κ_val, [description = "Eddy thermal diffusivity [m²/s]"]
+        a_mtn = a_val, [description = "Mountain half-width [m] (Eq. 7.1)"]
+        h_mtn = h_val, [description = "Mountain height [m] (Eq. 7.1)"]
     end
 
     # Dependent variables (perturbations from mean state, all SI units)
@@ -431,11 +431,6 @@ function MountainWave2D(;
             θ_p(t_pde, x_coord, z_coord), p_p(t_pde, x_coord, z_coord),
         ],
         [U_0, N_bv, Θ_ref, ρ_0, C_a, ν, κ_diff, a_mtn, h_mtn];
-        defaults = Dict(
-            U_0 => U_0_val, N_bv => N_val, Θ_ref => Θ_val, ρ_0 => ρ_0_val,
-            C_a => C_a_val, ν => ν_val, κ_diff => κ_val,
-            a_mtn => a_val, h_mtn => h_val
-        ),
         name,
         checks = false,
     )
