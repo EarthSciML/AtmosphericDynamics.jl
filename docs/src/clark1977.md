@@ -30,6 +30,7 @@ AnelasticThermodynamics
 DiagnosticPressure
 Clark1977AnelasticSystem
 MountainWave2D
+Clark1977FullPDESystem
 ```
 
 ## Implementation
@@ -358,9 +359,10 @@ The module now includes a complete implementation of the core Clark (1977) gover
 @named full_sys = Clark1977AnelasticSystem()
 
 # Count total variables in the complete system
-total_variables = sum(length(unknowns(sys)) for sys in full_sys.systems)
+subsystems = ModelingToolkit.get_systems(full_sys)
+total_variables = sum(length(unknowns(s)) for s in subsystems)
 println("Total variables in complete system: ", total_variables)
-println("Number of subsystems: ", length(full_sys.systems))
+println("Number of subsystems: ", length(subsystems))
 ```
 
 The complete system (`Clark1977AnelasticSystem`) integrates:

@@ -384,7 +384,7 @@ using AtmosphericDynamics
             # Stratification work = N²*Θ*w²/g
             # For small perturbations, these should be comparable in magnitude
             energy_ratio = (g_val / Θ_val) / (N_val^2 * Θ_val / g_val)
-            @test energy_ratio ≈ (g_val / Θ_val)^2 / N_val^2 rtol = 1e-10
+            @test energy_ratio ≈ (g_val / Θ_val)^2 / N_val^2 rtol = 1.0e-10
 
             # Verify dimensions are consistent for energy budget
             # [g*θ/Θ] = [m/s²] * [K] / [K] = [m/s²] ✓
@@ -451,9 +451,13 @@ using AtmosphericDynamics
             dp_dz = -ρ_p * 9.81  # Pa/m (positive pressure gradient for lighter air above)
 
             sol = solve(
-                NonlinearProblem(sys, Dict(
-                    sys.ρ_prime => ρ_p, sys.dp_dz => dp_dz)),
-                NewtonRaphson())
+                NonlinearProblem(
+                    sys, Dict(
+                        sys.ρ_prime => ρ_p, sys.dp_dz => dp_dz
+                    )
+                ),
+                NewtonRaphson()
+            )
             @test abs(sol[sys.mom_w]) < 1.0e-6  # Should be close to hydrostatic balance
         end
 
@@ -466,9 +470,13 @@ using AtmosphericDynamics
             u_val = 10.0  # m/s
 
             sol = solve(
-                NonlinearProblem(sys, Dict(
-                    sys.f_coriolis => f, sys.ρ => ρ_val, sys.u => u_val)),
-                NewtonRaphson())
+                NonlinearProblem(
+                    sys, Dict(
+                        sys.f_coriolis => f, sys.ρ => ρ_val, sys.u => u_val
+                    )
+                ),
+                NewtonRaphson()
+            )
 
             # Coriolis force should contribute ρuf to v-momentum
             # But the equation is: mom_v ~ ρ * dv_dt + ρ * v * f_coriolis + dp_dy - div_τ2 + ρ_bar * v / τ_R
@@ -511,11 +519,15 @@ using AtmosphericDynamics
             d_dz = 0.01   # kg/(m²s) ∂(ρ̄w)/∂z to balance
 
             sol = solve(
-                NonlinearProblem(sys, Dict(
-                    sys.ρ_bar => ρ_bar,
-                    sys.d_dx_rho_u => d_dx,
-                    sys.d_dz_rho_w => d_dz)),
-                NewtonRaphson())
+                NonlinearProblem(
+                    sys, Dict(
+                        sys.ρ_bar => ρ_bar,
+                        sys.d_dx_rho_u => d_dx,
+                        sys.d_dz_rho_w => d_dz
+                    )
+                ),
+                NewtonRaphson()
+            )
             @test sol[sys.mass_continuity] ≈ 0.0 atol = 1.0e-10
         end
 
@@ -553,11 +565,15 @@ using AtmosphericDynamics
             dθ_dx = 0.01  # K/m
 
             sol = solve(
-                NonlinearProblem(sys, Dict(
-                    sys.ρ_bar => ρ_bar,
-                    sys.K_H => K_H,
-                    sys.dθ_dx => dθ_dx)),
-                NewtonRaphson())
+                NonlinearProblem(
+                    sys, Dict(
+                        sys.ρ_bar => ρ_bar,
+                        sys.K_H => K_H,
+                        sys.dθ_dx => dθ_dx
+                    )
+                ),
+                NewtonRaphson()
+            )
 
             expected_H1 = ρ_bar * K_H * dθ_dx
             @test sol[sys.H1] ≈ expected_H1 rtol = 1.0e-6
@@ -572,11 +588,15 @@ using AtmosphericDynamics
             dH1_dx = ρ_bar * dθ_dt  # Balanced heating
 
             sol = solve(
-                NonlinearProblem(sys, Dict(
-                    sys.ρ_bar => ρ_bar,
-                    sys.dθ_dt => dθ_dt,
-                    sys.dH1_dx => dH1_dx)),
-                NewtonRaphson())
+                NonlinearProblem(
+                    sys, Dict(
+                        sys.ρ_bar => ρ_bar,
+                        sys.dθ_dt => dθ_dt,
+                        sys.dH1_dx => dH1_dx
+                    )
+                ),
+                NewtonRaphson()
+            )
             @test sol[sys.thermo_residual] ≈ 0.0 atol = 1.0e-10
         end
 
@@ -604,11 +624,15 @@ using AtmosphericDynamics
             d2p_dz2 = -0.002  # Pa/m²
 
             sol = solve(
-                NonlinearProblem(sys, Dict(
-                    sys.d2p_dx2 => d2p_dx2,
-                    sys.d2p_dy2 => d2p_dy2,
-                    sys.d2p_dz2 => d2p_dz2)),
-                NewtonRaphson())
+                NonlinearProblem(
+                    sys, Dict(
+                        sys.d2p_dx2 => d2p_dx2,
+                        sys.d2p_dy2 => d2p_dy2,
+                        sys.d2p_dz2 => d2p_dz2
+                    )
+                ),
+                NewtonRaphson()
+            )
 
             expected_laplacian = d2p_dx2 + d2p_dy2 + d2p_dz2
             @test sol[sys.laplacian_p] ≈ expected_laplacian rtol = 1.0e-6
@@ -622,10 +646,14 @@ using AtmosphericDynamics
             C_a = 50.0  # m/s
 
             sol = solve(
-                NonlinearProblem(sys, Dict(
-                    sys.p_prime => p_prime,
-                    sys.C_a => C_a)),
-                NewtonRaphson())
+                NonlinearProblem(
+                    sys, Dict(
+                        sys.p_prime => p_prime,
+                        sys.C_a => C_a
+                    )
+                ),
+                NewtonRaphson()
+            )
 
             # Check that acoustic term g*p'/C² is computed
             expected_acoustic = 9.81 * p_prime / C_a^2
@@ -644,14 +672,14 @@ using AtmosphericDynamics
         @testset "Construction" begin
             @named full_system = Clark1977AnelasticSystem()
             @test full_system isa System
-            @test length(full_system.systems) == 8  # All subsystems included
+            @test length(ModelingToolkit.get_systems(full_system)) == 8  # All subsystems included
         end
 
         @testset "Subsystem Integration" begin
             @named full_system = Clark1977AnelasticSystem()
 
             # Check that all required subsystems are present
-            system_names = [nameof(sys) for sys in full_system.systems]
+            system_names = [nameof(sys) for sys in ModelingToolkit.get_systems(full_system)]
             expected_names = [
                 :base_state, :topography, :transform, :turbulence,
                 :momentum, :mass_continuity, :thermodynamics, :pressure_diag,
@@ -666,7 +694,7 @@ using AtmosphericDynamics
             @named full_system = Clark1977AnelasticSystem()
 
             # The full system should have many variables from all subsystems
-            total_unknowns = sum(length(unknowns(sys)) for sys in full_system.systems)
+            total_unknowns = sum(length(unknowns(sys)) for sys in ModelingToolkit.get_systems(full_system))
             @test total_unknowns > 25  # Significant number of variables
         end
 
