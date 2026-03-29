@@ -55,9 +55,9 @@ Variables (outputs):
                 unit = u"J/(kg*K)",
             ]
         inv_kappa = c_p / R_d,
-            [description = "C_p/R_d = 1/κ, pressure profile exponent (dimensionless)", unit = u"1"]
+            [description = "C_p/R_d = 1/κ, pressure profile exponent (dimensionless)"]
         inv_kappa_m1 = c_p / R_d - 1.0,
-            [description = "C_p/R_d - 1, density profile exponent (dimensionless)", unit = u"1"]
+            [description = "C_p/R_d - 1, density profile exponent (dimensionless)"]
     end
 
     @parameters begin
@@ -114,7 +114,7 @@ where:
     @variables begin
         z_s(t), [description = "Terrain surface height (Eq. 7.1)", unit = u"m"]
         dz_s_dx(t),
-            [description = "Terrain slope ∂z_s/∂x (dimensionless)", unit = u"1"]
+            [description = "Terrain slope ∂z_s/∂x (dimensionless)"]
     end
 
     eqs = [
@@ -160,21 +160,21 @@ Variables (outputs):
         H = 8000.0, [description = "Domain height", unit = u"m"]
         z_bar = 0.0, [description = "Transformed vertical coordinate", unit = u"m"]
         dz_s_dx = 0.0,
-            [description = "Terrain slope ∂z_s/∂x (dimensionless)", unit = u"1"]
+            [description = "Terrain slope ∂z_s/∂x (dimensionless)"]
         dz_s_dy = 0.0,
-            [description = "Terrain slope ∂z_s/∂y (dimensionless)", unit = u"1"]
+            [description = "Terrain slope ∂z_s/∂y (dimensionless)"]
     end
 
     @variables begin
         G_sqrt(t),
-            [description = "Jacobian G^(1/2) = 1 - z_s/H (Eq. 2.21) (dimensionless)", unit = u"1"]
+            [description = "Jacobian G^(1/2) = 1 - z_s/H (Eq. 2.21) (dimensionless)"]
         G_sqrt_G13(t),
-            [description = "Metric coefficient G^(1/2)·G^13 (Eq. 2.22) (dimensionless)", unit = u"1"]
+            [description = "Metric coefficient G^(1/2)·G^13 (Eq. 2.22) (dimensionless)"]
         G_sqrt_G23(t),
-            [description = "Metric coefficient G^(1/2)·G^23 (Eq. 2.23) (dimensionless)", unit = u"1"]
+            [description = "Metric coefficient G^(1/2)·G^23 (Eq. 2.23) (dimensionless)"]
         z_phys(t), [description = "Physical height z (inverse of Eq. 2.20)", unit = u"m"]
         ω_diag(t),
-            [description = "Diagnostic factor for ω: ω·G^(1/2) = w + G^(1/2)G^13·u + G^(1/2)G^23·v (Eq. 2.27) (dimensionless)", unit = u"1"]
+            [description = "Diagnostic factor for ω: ω·G^(1/2) = w + G^(1/2)G^13·u + G^(1/2)G^23·v (Eq. 2.27) (dimensionless)"]
     end
 
     eqs = [
@@ -214,14 +214,14 @@ The turbulent heat diffusivity is assumed equal to the eddy viscosity:
 @component function SmagorinskyTurbulence(; name = :SmagorinskyTurbulence)
     @constants begin
         k_smag = 0.25,
-            [description = "Smagorinsky constant (Eq. 2.17) (dimensionless)", unit = u"1"]
+            [description = "Smagorinsky constant (Eq. 2.17) (dimensionless)"]
         Def_ref = 1.0,
             [
                 description = "Reference deformation rate for non-dimensionalization",
                 unit = u"1/s",
             ]
         two_thirds = 2.0/3.0,
-            [description = "Coefficient 2/3 in deformation tensor trace subtraction (dimensionless)", unit = u"1"]
+            [description = "Coefficient 2/3 in deformation tensor trace subtraction (dimensionless)"]
     end
 
     @parameters begin
@@ -509,7 +509,7 @@ to ensure the anelastic constraint ∇·(ρ̄V) = 0 is satisfied.
         C_a = 50.0, [description = "Pseudo-compressible acoustic speed", unit = u"m/s"]
 
         # Jacobian factor from terrain-following coordinates
-        G_sqrt = 1.0, [description = "G^(1/2) Jacobian factor (dimensionless)", unit = u"1"]
+        G_sqrt = 1.0, [description = "G^(1/2) Jacobian factor (dimensionless)"]
 
         # Pressure and derivatives
         p_prime = 0.0, [description = "Pressure perturbation", unit = u"Pa"]
@@ -858,7 +858,7 @@ function Clark1977FullPDESystem(;
         g = g_val, [description = "Gravitational acceleration", unit = u"m/s^2"]
         f = f_val, [description = "Coriolis parameter", unit = u"1/s"]
         τ_R = τ_R_val, [description = "Rayleigh friction timescale", unit = u"s"]
-        C_s = C_s_val, [description = "Smagorinsky constant (dimensionless)", unit = u"1"]
+        C_s = C_s_val, [description = "Smagorinsky constant (dimensionless)"]
     end
 
     # Model parameters
