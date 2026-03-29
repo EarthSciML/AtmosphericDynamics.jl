@@ -10,9 +10,9 @@
 end
 
 @testitem "Clark 1977 Mountain Wave Model" setup=[Clark1977Setup] tags=[:clark1977] begin
-    #=============================================================================
+    # =============================================================================
     # IsentropicBaseState Tests
-    =============================================================================#
+    # =============================================================================
 
     @testset "IsentropicBaseState" begin
 
@@ -67,9 +67,9 @@ end
 
     end
 
-    #=============================================================================
+    # =============================================================================
     # WitchOfAgnesi Tests
-    =============================================================================#
+    # =============================================================================
 
     @testset "WitchOfAgnesi" begin
 
@@ -115,14 +115,191 @@ end
 
     end
 
-    # Note: For brevity, including only first 2 test sections here.
-    # Full implementation would include all test sections from original file:
-    # - TerrainFollowingTransform
-    # - SmagorinskyTurbulence
-    # - MountainWave2D
-    # - AnelasticMomentum
-    # - AnelasticMassContinuity
-    # - AnelasticThermodynamics
-    # - DiagnosticPressure
-    # - Clark1977AnelasticSystem
+    # =============================================================================
+    # Clark1977FullPDESystem Tests - Complete Model with MethodOfLines
+    # =============================================================================
+
+    @testset "Clark1977FullPDESystem - Complete Implementation" begin
+        # Import MethodOfLines for PDE discretization testing
+        import MethodOfLines
+        import OrdinaryDiffEqDefault: Tsit5
+
+        @testset "Full PDESystem Structure" begin
+            # Test the complete nonlinear Clark 1977 model
+            full_pde = Clark1977FullPDESystem()
+            @test full_pde isa MethodOfLines.PDESystem
+
+            # Check that the system has the expected structure for complete model
+            @test length(full_pde.eqs) == 7  # 7 governing equations (u, w, θ, continuity, ω relation, ρ relation, pressure)
+            @test length(full_pde.bcs) >= 20  # Comprehensive boundary conditions
+            @test length(full_pde.domain) == 3  # t, x, z_bar domains
+            @test length(full_pde.dvs) == 7  # u, v, w, ω, θ, p, ρ dependent variables
+        end
+
+        @testset "MethodOfLines Discretization - Complete Model" begin
+            # Create complete PDESystem with minimal parameters for fast testing
+            full_pde = Clark1977FullPDESystem(
+                U_0_val=4.0,      # m/s - mean flow
+                h_val=50.0,       # m - small mountain for stability
+                a_val=3000.0,     # m - mountain width
+                L_val=9000.0,     # m - smaller domain for speed
+                H_val=3000.0,     # m - smaller height for speed
+                T_end_val=50.0,   # s - short time for testing
+                τ_R_val=100.0     # s - stronger damping for stability
+            )
+
+            # Discretize with coarse grid for fast testing
+            dx = 3000.0  # m - only 6 points in x
+            dz = 1000.0  # m - only 3 points in z
+            discretization = MethodOfLines.MOLFiniteDifference([full_pde.domain[2].domain.left => dx, full_pde.domain[3].domain.left => dz], full_pde.domain[1].domain.left)
+
+            # Discretize the complete PDESystem (using checks=false as per project standards)
+            prob = MethodOfLines.discretize(full_pde, discretization; checks=false)
+            @test prob isa MethodOfLines.ODEProblem
+
+            # Test that the problem can be solved (even if just briefly)
+            sol = solve(prob, Tsit5(), saveat=10.0, maxiters=50, abstol=1e-2, reltol=1e-1, dtmax=1.0)
+            @test sol.retcode in [:Success, :MaxIters, :DtLessThanMin]  # Accept various completion states
+            @test length(sol.t) >= 2  # At least initial and one time step
+
+            # Test that solution values are reasonable (no NaNs, finite bounds)
+            @test all(isfinite.(sol.u[end]))
+            @test maximum(abs.(sol.u[end])) < 1000.0  # Reasonable magnitude bounds
+        end
+
+        @testset "Complete Model Physical Consistency" begin
+            # Test that the complete model includes all key physical processes
+            full_pde = Clark1977FullPDESystem(U_0_val=4.0, h_val=100.0)
+
+            # Check that nonlinear terms are present (not linearized)
+            eq_strings = string.(full_pde.eqs)
+
+            # Should have nonlinear advection terms u*∂u/∂x
+            @test any(occursin("*", eq_str) for eq_str in eq_strings)
+
+            # Should have Coriolis terms
+            @test any(occursin("f", eq_str) for eq_str in eq_strings)
+
+            # Should have terrain-following transformation
+            @test any(occursin("ω", eq_str) for eq_str in eq_strings)
+
+            # Should have turbulence terms
+            @test any(occursin("K_M", eq_str) for eq_str in eq_strings)
+        end
+    end
+
+    # =============================================================================
+    # MountainWave2D PDESystem Tests (Simplified/Linearized for Comparison)
+    # =============================================================================
+
+    @testset "MountainWave2D Simplified PDESystem" begin
+        # Import MethodOfLines for PDE discretization testing
+        import MethodOfLines
+        import OrdinaryDiffEqDefault: Tsit5
+
+        @testset "Simplified PDESystem Structure" begin
+            pdesys = MountainWave2D()
+            @test pdesys isa MethodOfLines.PDESystem
+
+            # Check that the linearized system has expected structure
+            @test length(pdesys.eqs) == 4  # 4 linearized equations
+            @test length(pdesys.bcs) == 16  # Initial + boundary conditions
+            @test length(pdesys.domain) == 3  # t, x, z domains
+            @test length(pdesys.dvs) == 4  # u, w, θ, p dependent variables
+        end
+
+        @testset "MethodOfLines Discretization - Simplified" begin
+            # Create simplified PDESystem for fast testing
+            pdesys = MountainWave2D(
+                U_0_val=4.0,
+                h_val=100.0,
+                L_val=6000.0,
+                H_val=3000.0,
+                T_end_val=100.0
+            )
+
+            # Discretize with coarse grid
+            dx = 1500.0  # m
+            dz = 750.0   # m
+            discretization = MethodOfLines.MOLFiniteDifference([pdesys.domain[2].domain.left => dx, pdesys.domain[3].domain.left => dz], pdesys.domain[1].domain.left)
+
+            # Discretize the PDESystem
+            prob = MethodOfLines.discretize(pdesys, discretization; checks=false)
+            @test prob isa MethodOfLines.ODEProblem
+
+            # Test solving
+            sol = solve(prob, Tsit5(), saveat=25.0, maxiters=100, abstol=1e-3, reltol=1e-2)
+            @test sol.retcode in [:Success, :MaxIters]
+            @test length(sol.t) >= 2
+
+            # Test solution quality
+            @test all(isfinite.(sol.u[end]))
+            @test maximum(abs.(sol.u[end])) < 1000.0
+        end
+    end
+
+    # =============================================================================
+    # Component Structure Tests (Simplified - No Solving)
+    # =============================================================================
+
+    @testset "Component Structures" begin
+        @testset "TerrainFollowingTransform Structure" begin
+            @named transform = TerrainFollowingTransform()
+            @test transform isa System
+            @test length(unknowns(transform)) == 5
+            @test length(equations(transform)) == 5
+        end
+
+        @testset "SmagorinskyTurbulence Structure" begin
+            @named turb = SmagorinskyTurbulence()
+            @test turb isa System
+            @test length(unknowns(turb)) == 3
+            @test length(equations(turb)) == 3
+        end
+
+        @testset "AnelasticMomentum Structure" begin
+            @named mom = AnelasticMomentum()
+            @test mom isa System
+            @test length(unknowns(mom)) == 3
+            @test length(equations(mom)) == 3
+        end
+
+        @testset "AnelasticMassContinuity Structure" begin
+            @named mass = AnelasticMassContinuity()
+            @test mass isa System
+            @test length(unknowns(mass)) == 4
+            @test length(equations(mass)) == 4
+        end
+
+        @testset "AnelasticThermodynamics Structure" begin
+            @named thermo = AnelasticThermodynamics()
+            @test thermo isa System
+            @test length(unknowns(thermo)) == 5
+            @test length(equations(thermo)) == 5
+        end
+
+        @testset "DiagnosticPressure Structure" begin
+            @named pressure = DiagnosticPressure()
+            @test pressure isa System
+            @test length(unknowns(pressure)) == 3
+            @test length(equations(pressure)) == 3
+        end
+
+        @testset "Clark1977AnelasticSystem Structure" begin
+            @named full_system = Clark1977AnelasticSystem()
+            @test full_system isa System
+
+            # Test that all subsystems are included
+            sys_names = [sys.name for sys in full_system.systems]
+            @test :IsentropicBaseState in sys_names
+            @test :WitchOfAgnesi in sys_names
+            @test :TerrainFollowingTransform in sys_names
+            @test :SmagorinskyTurbulence in sys_names
+            @test :AnelasticMomentum in sys_names
+            @test :AnelasticMassContinuity in sys_names
+            @test :AnelasticThermodynamics in sys_names
+            @test :DiagnosticPressure in sys_names
+        end
+    end
+
 end

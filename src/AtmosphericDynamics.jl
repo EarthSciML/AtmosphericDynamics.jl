@@ -17,7 +17,7 @@ include("clark1977.jl")
 
 # Exports from clark1977.jl
 export IsentropicBaseState, WitchOfAgnesi, TerrainFollowingTransform
-export SmagorinskyTurbulence, MountainWave2D
+export SmagorinskyTurbulence, MountainWave2D, Clark1977FullPDESystem
 export AnelasticMomentum, AnelasticMassContinuity, AnelasticThermodynamics
 export DiagnosticPressure, Clark1977AnelasticSystem
 

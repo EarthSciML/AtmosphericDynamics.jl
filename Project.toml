@@ -12,6 +12,7 @@ EarthSciMLBase = "e53f1632-a13c-4728-9402-0c66d48804b0"
 ModelingToolkit = "961ee093-0014-501f-94e3-6117800e7a78"
 Runic = "62bfec6d-59d7-401d-8490-b29ee721c001"
 TestEnv = "1e6cf692-eddd-4d53-88a5-2d735e33781b"
+TestItemRunner = "f8b46487-2199-4994-9208-9a1283c18c0a"
 
 [compat]
 Coverage = "1.8.1"
@@ -26,6 +27,7 @@ OrdinaryDiffEqDefault = "1.10"
 Runic = "1.5.1"
 SciMLBase = "2.130"
 TestEnv = "1.103.6"
+TestItemRunner = "1.1.5"
 julia = "1.10"
 
 [extras]
