@@ -217,11 +217,9 @@ The turbulent heat diffusivity is assumed equal to the eddy viscosity:
             [description = "Smagorinsky constant (Eq. 2.17) (dimensionless)"]
         Def_ref = 1.0,
             [
-                description = "Reference deformation rate for non-dimensionalization",
+                description = "Reference deformation rate for dimensional consistency",
                 unit = u"1/s",
             ]
-        two_thirds = 2.0 / 3.0,
-            [description = "Coefficient 2/3 in deformation tensor trace subtraction (dimensionless)"]
     end
 
     @parameters begin
@@ -246,8 +244,7 @@ The turbulent heat diffusivity is assumed equal to the eddy viscosity:
     # Implement the full deformation tensor from Eq. 2.16
     # D_ij = (∂u_i/∂x_j + ∂u_j/∂x_i) - (2/3)δ_ij ∂u_k/∂x_k
     # The input D_ij values should already include the trace subtraction
-    # Non-dimensionalize before sqrt to handle units correctly
-    # Def² has units 1/s², sqrt(1/s²) = 1/s
+    # For dimensional consistency with square root operation, use reference scale
     Def_sq_dimless = (
         0.5 * (D11^2 + D22^2 + D33^2) +
             D12^2 + D13^2 + D23^2
@@ -829,8 +826,12 @@ function Clark1977FullPDESystem(;
         g_val = 9.81,       # m/s² - gravity
         f_val = 1.0e-4,     # 1/s - Coriolis parameter
 
+        # Pseudo-compressible parameters
+        C_a_val = 50.0,     # m/s - pseudo-compressible acoustic speed
+
         # Turbulence parameters
         C_s_val = 0.25,     # Smagorinsky constant
+        N_grid_val = 50,    # Grid points across domain for turbulence scale
 
         # Topography parameters (Table I)
         a_val = 3000.0,     # m - mountain half-width
@@ -863,6 +864,8 @@ function Clark1977FullPDESystem(;
         f = f_val, [description = "Coriolis parameter", unit = u"1/s"]
         τ_R = τ_R_val, [description = "Rayleigh friction timescale", unit = u"s"]
         C_s = C_s_val, [description = "Smagorinsky constant (dimensionless)"]
+        C_a = C_a_val, [description = "Pseudo-compressible acoustic speed", unit = u"m/s"]
+        N_grid = N_grid_val, [description = "Grid points across domain (dimensionless)"]
     end
 
     # Model parameters
@@ -908,7 +911,7 @@ function Clark1977FullPDESystem(;
     ρ_bar = ρ_0 * exp(-z_bar / (N_bv^2 * Θ_0 / g))
 
     # Grid scale for turbulence (estimated from domain)
-    Δ_grid = L_val / 50  # Assume ~50 grid points across domain
+    Δ_grid = H_domain / N_grid  # Grid scale based on domain height and grid points
 
     # Deformation tensor components for Smagorinsky model
     D11 = Dx(u_field) - (Dx(u_field) + Dz(ω_field)) / 3
@@ -957,7 +960,7 @@ function Clark1977FullPDESystem(;
         ρ_field ~ -ρ_bar * θ_field / Θ_0,
 
         # Simplified pressure evolution (pseudo-compressible relaxation)
-        Dt(p_field) ~ -50.0^2 * ρ_bar * (Dx(u_field) + Dz(ω_field)),
+        Dt(p_field) ~ -C_a^2 * ρ_bar * (Dx(u_field) + Dz(ω_field)),
     ]
 
     # Boundary conditions - comprehensive set
@@ -1014,7 +1017,7 @@ function Clark1977FullPDESystem(;
             u(t_pde, x, z_bar), v(t_pde, x, z_bar), w(t_pde, x, z_bar),
             ω(t_pde, x, z_bar), θ(t_pde, x, z_bar), p(t_pde, x, z_bar), ρ(t_pde, x, z_bar),
         ],
-        [U_0, N_bv, Θ_0, ρ_0, a_mtn, h_mtn, H_domain, g, f, τ_R, C_s];
+        [U_0, N_bv, Θ_0, ρ_0, a_mtn, h_mtn, H_domain, g, f, τ_R, C_s, C_a, N_grid];
         name, checks = false
     )
 end
