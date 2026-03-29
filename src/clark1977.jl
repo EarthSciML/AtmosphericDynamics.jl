@@ -220,7 +220,7 @@ The turbulent heat diffusivity is assumed equal to the eddy viscosity:
                 description = "Reference deformation rate for non-dimensionalization",
                 unit = u"1/s",
             ]
-        two_thirds = 2.0/3.0,
+        two_thirds = 2.0 / 3.0,
             [description = "Coefficient 2/3 in deformation tensor trace subtraction (dimensionless)"]
     end
 
@@ -594,10 +594,14 @@ unlike the simplified `MountainWave2D` system which uses linearized equations.
     # No additional equations needed - this is a composition of subsystems
     eqs = Equation[]
 
-    return System(eqs, t;
-        systems=[base_state, topography, transform, turbulence,
-                momentum, mass_continuity, thermodynamics, pressure_diag],
-        name)
+    return System(
+        eqs, t;
+        systems = [
+            base_state, topography, transform, turbulence,
+            momentum, mass_continuity, thermodynamics, pressure_diag,
+        ],
+        name
+    )
 end
 
 #=============================================================================
@@ -933,11 +937,11 @@ function Clark1977FullPDESystem(;
     eqs = [
         # u-momentum (Eq. 2.1) - nonlinear with Coriolis
         Dt(u_field) ~ -advect_u + f * v_field - Dx(p_field) / ρ_bar +
-                      div_tau_u / ρ_bar - u_field / τ_R,
+            div_tau_u / ρ_bar - u_field / τ_R,
 
         # w-momentum (Eq. 2.3) - nonlinear with buoyancy
         Dt(w_field) ~ -advect_w - Dz(p_field) / ρ_bar + g * ρ_field / ρ_bar +
-                      div_tau_w / ρ_bar - w_field / τ_R,
+            div_tau_w / ρ_bar - w_field / τ_R,
 
         # Potential temperature (Eq. 2.14) - nonlinear with stratification
         Dt(θ_field) ~ -advect_θ - N_bv^2 * Θ_0 / g * ω_field + div_H / ρ_bar,
@@ -953,7 +957,7 @@ function Clark1977FullPDESystem(;
         ρ_field ~ -ρ_bar * θ_field / Θ_0,
 
         # Simplified pressure evolution (pseudo-compressible relaxation)
-        Dt(p_field) ~ -50.0^2 * ρ_bar * (Dx(u_field) + Dz(ω_field))
+        Dt(p_field) ~ -50.0^2 * ρ_bar * (Dx(u_field) + Dz(ω_field)),
     ]
 
     # Boundary conditions - comprehensive set
@@ -993,22 +997,24 @@ function Clark1977FullPDESystem(;
         Dx(u(t_pde, L_val, z_bar)) ~ 0.0,
         Dx(v(t_pde, L_val, z_bar)) ~ 0.0,
         Dx(w(t_pde, L_val, z_bar)) ~ 0.0,
-        Dx(θ(t_pde, L_val, z_bar)) ~ 0.0
+        Dx(θ(t_pde, L_val, z_bar)) ~ 0.0,
     ]
 
     # Domain specification
     domains = [
         t_pde ∈ Interval(0.0, T_end_val),
         x ∈ Interval(-L_val, L_val),
-        z_bar ∈ Interval(0.0, H_val)
+        z_bar ∈ Interval(0.0, H_val),
     ]
 
     return PDESystem(
         eqs, bcs, domains,
         [t_pde, x, z_bar],
-        [u(t_pde, x, z_bar), v(t_pde, x, z_bar), w(t_pde, x, z_bar),
-         ω(t_pde, x, z_bar), θ(t_pde, x, z_bar), p(t_pde, x, z_bar), ρ(t_pde, x, z_bar)],
+        [
+            u(t_pde, x, z_bar), v(t_pde, x, z_bar), w(t_pde, x, z_bar),
+            ω(t_pde, x, z_bar), θ(t_pde, x, z_bar), p(t_pde, x, z_bar), ρ(t_pde, x, z_bar),
+        ],
         [U_0, N_bv, Θ_0, ρ_0, a_mtn, h_mtn, H_domain, g, f, τ_R, C_s];
-        name, checks=false
+        name, checks = false
     )
 end

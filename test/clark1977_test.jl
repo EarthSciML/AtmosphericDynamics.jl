@@ -11,7 +11,7 @@
     ENV["JULIA_PKG_PRECOMPILE_AUTO"] = "1"
 end
 
-@testitem "Clark 1977 Mountain Wave Model" setup=[Clark1977Setup] tags=[:clark1977] begin
+@testitem "Clark 1977 Mountain Wave Model" setup = [Clark1977Setup] tags = [:clark1977] begin
     # =============================================================================
     # IsentropicBaseState Tests
     # =============================================================================
@@ -141,13 +141,13 @@ end
         @testset "MethodOfLines Discretization - Complete Model" begin
             # Create complete PDESystem with minimal parameters for fast testing
             full_pde = Clark1977FullPDESystem(
-                U_0_val=4.0,      # m/s - mean flow
-                h_val=50.0,       # m - small mountain for stability
-                a_val=3000.0,     # m - mountain width
-                L_val=9000.0,     # m - smaller domain for speed
-                H_val=3000.0,     # m - smaller height for speed
-                T_end_val=50.0,   # s - short time for testing
-                τ_R_val=100.0     # s - stronger damping for stability
+                U_0_val = 4.0,      # m/s - mean flow
+                h_val = 50.0,       # m - small mountain for stability
+                a_val = 3000.0,     # m - mountain width
+                L_val = 9000.0,     # m - smaller domain for speed
+                H_val = 3000.0,     # m - smaller height for speed
+                T_end_val = 50.0,   # s - short time for testing
+                τ_R_val = 100.0     # s - stronger damping for stability
             )
 
             # Discretize with coarse grid for fast testing
@@ -156,11 +156,11 @@ end
             discretization = MethodOfLines.MOLFiniteDifference([full_pde.domain[2].domain.left => dx, full_pde.domain[3].domain.left => dz], full_pde.domain[1].domain.left)
 
             # Discretize the complete PDESystem (using checks=false as per project standards)
-            prob = MethodOfLines.discretize(full_pde, discretization; checks=false)
+            prob = MethodOfLines.discretize(full_pde, discretization; checks = false)
             @test prob isa MethodOfLines.ODEProblem
 
             # Test that the problem can be solved (even if just briefly)
-            sol = solve(prob, Tsit5(), saveat=10.0, maxiters=50, abstol=1e-2, reltol=1e-1, dtmax=1.0)
+            sol = solve(prob, Tsit5(), saveat = 10.0, maxiters = 50, abstol = 1.0e-2, reltol = 1.0e-1, dtmax = 1.0)
             @test sol.retcode in [:Success, :MaxIters, :DtLessThanMin]  # Accept various completion states
             @test length(sol.t) >= 2  # At least initial and one time step
 
@@ -171,7 +171,7 @@ end
 
         @testset "Complete Model Physical Consistency" begin
             # Test that the complete model includes all key physical processes
-            full_pde = Clark1977FullPDESystem(U_0_val=4.0, h_val=100.0)
+            full_pde = Clark1977FullPDESystem(U_0_val = 4.0, h_val = 100.0)
 
             # Check that nonlinear terms are present (not linearized)
             eq_strings = string.(full_pde.eqs)
@@ -214,11 +214,11 @@ end
         @testset "MethodOfLines Discretization - Simplified" begin
             # Create simplified PDESystem for fast testing
             pdesys = MountainWave2D(
-                U_0_val=4.0,
-                h_val=100.0,
-                L_val=6000.0,
-                H_val=3000.0,
-                T_end_val=100.0
+                U_0_val = 4.0,
+                h_val = 100.0,
+                L_val = 6000.0,
+                H_val = 3000.0,
+                T_end_val = 100.0
             )
 
             # Discretize with coarse grid
@@ -227,11 +227,11 @@ end
             discretization = MethodOfLines.MOLFiniteDifference([pdesys.domain[2].domain.left => dx, pdesys.domain[3].domain.left => dz], pdesys.domain[1].domain.left)
 
             # Discretize the PDESystem
-            prob = MethodOfLines.discretize(pdesys, discretization; checks=false)
+            prob = MethodOfLines.discretize(pdesys, discretization; checks = false)
             @test prob isa MethodOfLines.ODEProblem
 
             # Test solving
-            sol = solve(prob, Tsit5(), saveat=25.0, maxiters=100, abstol=1e-3, reltol=1e-2)
+            sol = solve(prob, Tsit5(), saveat = 25.0, maxiters = 100, abstol = 1.0e-3, reltol = 1.0e-2)
             @test sol.retcode in [:Success, :MaxIters]
             @test length(sol.t) >= 2
 
@@ -343,7 +343,7 @@ end
 
             # Verify that different mountain heights produce different systems
             @test sys_run14.ps[findfirst(p -> p.description == "Mountain height (Eq. 7.1)", sys_run14.ps)].default !=
-                  sys_run15.ps[findfirst(p -> p.description == "Mountain height (Eq. 7.1)", sys_run15.ps)].default
+                sys_run15.ps[findfirst(p -> p.description == "Mountain height (Eq. 7.1)", sys_run15.ps)].default
         end
 
         @testset "Witch of Agnesi Topography (Eq. 7.1)" begin
@@ -362,7 +362,7 @@ end
             @test sol_halfwidth[sys.z_s] ≈ 50.0  # h_mtn/2 = 50.0
 
             # Test slope calculation at center: dz_s/dx should be 0
-            @test sol_center[sys.dz_s_dx] ≈ 0.0 rtol=1e-10
+            @test sol_center[sys.dz_s_dx] ≈ 0.0 rtol = 1.0e-10
         end
 
         @testset "Isentropic Scale Height Validation" begin
@@ -375,8 +375,8 @@ end
 
             # Expected: H_s = 1004.0 * 300.0 / 9.81 ≈ 30,683 m
             H_s_expected = 1004.0 * 300.0 / 9.81
-            @test sol[sys.H_s] ≈ H_s_expected rtol=1e-6
-            @test H_s_expected ≈ 30683.0 rtol=1e-2  # Check our calculation
+            @test sol[sys.H_s] ≈ H_s_expected rtol = 1.0e-6
+            @test H_s_expected ≈ 30683.0 rtol = 1.0e-2  # Check our calculation
         end
 
         @testset "Brunt-Väisälä Frequency Validation" begin
@@ -386,13 +386,13 @@ end
 
             g = 9.81  # m/s²
             Θ = 300.0  # K
-            dtheta_dz = 3.0/1000.0  # K/m (3K/km)
+            dtheta_dz = 3.0 / 1000.0  # K/m (3K/km)
 
-            N_squared_expected = (g/Θ) * dtheta_dz
+            N_squared_expected = (g / Θ) * dtheta_dz
             N_expected = sqrt(N_squared_expected)
 
-            @test N_expected ≈ 0.00991 rtol=1e-3
-            @test N_expected ≈ 0.01 rtol=1e-1  # Matches paper value
+            @test N_expected ≈ 0.00991 rtol = 1.0e-3
+            @test N_expected ≈ 0.01 rtol = 1.0e-1  # Matches paper value
         end
 
         @testset "Inverse Froude Number (Eq. 7.5)" begin
@@ -408,7 +408,7 @@ end
             T_n = 2π / sqrt(g * S)  # Natural time scale
             F = T_f / T_n  # Inverse Froude number
 
-            @test F ≈ 1.18 rtol=1e-2  # Matches Eq. 7.5
+            @test F ≈ 1.18 rtol = 1.0e-2  # Matches Eq. 7.5
         end
 
         @testset "Wave Drag Validation (Paper Results)" begin
@@ -431,9 +431,9 @@ end
             a = 3.0        # km
 
             # Expected wave drag scaling: ∼ ρ₀U₀²h²/a ∼ O(10²) kg sec⁻²
-            D_w_scale = ρ_0 * U_0^2 * (h*1000)^2 / (a*1000)  # Convert to SI
+            D_w_scale = ρ_0 * U_0^2 * (h * 1000)^2 / (a * 1000)  # Convert to SI
 
-            @test D_w_scale ≈ 2.13 rtol=1e-1  # Order of magnitude check
+            @test D_w_scale ≈ 2.13 rtol = 1.0e-1  # Order of magnitude check
             @test abs(D_w_run14_expected) > 100.0  # Paper values in correct range
             @test abs(D_w_run18_expected) > 100.0  # Paper values in correct range
 
@@ -458,7 +458,7 @@ end
             total_x_domain_paper = NX_paper * Δx_paper  # 37200 m
             our_domain_width = 2 * 18000.0  # 36000 m (our L_val = 18km)
 
-            @test our_domain_width ≈ total_x_domain_paper rtol=1e-1
+            @test our_domain_width ≈ total_x_domain_paper rtol = 1.0e-1
 
             # NZ = 82 → total z-domain = 82 × 100m = 8.2 km
             # Our H_val = 8000m ≈ 8.2 km ✓
@@ -466,7 +466,7 @@ end
             total_z_domain_paper = NZ_paper_case1 * Δz_paper_100  # 8200 m
             our_domain_height = 8000.0  # m
 
-            @test our_domain_height ≈ total_z_domain_paper rtol=1e-1
+            @test our_domain_height ≈ total_z_domain_paper rtol = 1.0e-1
         end
     end
 
@@ -501,13 +501,15 @@ end
             x_var = sys.ivs[2]     # x_coord
             z_var = sys.ivs[3]     # z_coord
 
-            discretization = MOLFiniteDifference([
-                x_var => dx,  # x direction
-                z_var => dz   # z direction
-            ], time_var)  # Time variable
+            discretization = MOLFiniteDifference(
+                [
+                    x_var => dx,  # x direction
+                    z_var => dz,   # z direction
+                ], time_var
+            )  # Time variable
 
             # This should work without errors if equations are correct
-            prob = discretize(sys, discretization; checks=false)
+            prob = discretize(sys, discretization; checks = false)
             @test prob isa ODEProblem
 
         catch e
