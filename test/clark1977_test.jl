@@ -7,6 +7,8 @@
     using ModelingToolkit: mtkcompile
     using NonlinearSolve
     using AtmosphericDynamics
+    # Reduce timeout sensitivity for CI
+    ENV["JULIA_PKG_PRECOMPILE_AUTO"] = "1"
 end
 
 @testitem "Clark 1977 Mountain Wave Model" setup=[Clark1977Setup] tags=[:clark1977] begin
