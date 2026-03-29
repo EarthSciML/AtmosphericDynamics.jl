@@ -7,6 +7,8 @@
     using ModelingToolkit: mtkcompile
     using NonlinearSolve
     using AtmosphericDynamics
+    using MethodOfLines
+    using OrdinaryDiffEqDefault: Tsit5
     # Reduce timeout sensitivity for CI
     ENV["JULIA_PKG_PRECOMPILE_AUTO"] = "1"
 end
@@ -122,9 +124,7 @@ end
     # =============================================================================
 
     @testset "Clark1977FullPDESystem - Complete Implementation" begin
-        # Import MethodOfLines for PDE discretization testing
-        import MethodOfLines
-        import OrdinaryDiffEqDefault: Tsit5
+        # MethodOfLines and OrdinaryDiffEqDefault now imported in setup
 
         @testset "Full PDESystem Structure" begin
             # Test the complete nonlinear Clark 1977 model
@@ -153,7 +153,7 @@ end
             # Discretize with coarse grid for fast testing
             dx = 3000.0  # m - only 6 points in x
             dz = 1000.0  # m - only 3 points in z
-            discretization = MethodOfLines.MOLFiniteDifference([full_pde.domain[2].domain.left => dx, full_pde.domain[3].domain.left => dz], full_pde.domain[1].domain.left)
+            discretization = MethodOfLines.MOLFiniteDifference([full_pde.ivs[2] => dx, full_pde.ivs[3] => dz], full_pde.ivs[1])
 
             # Discretize the complete PDESystem (using checks=false as per project standards)
             prob = MethodOfLines.discretize(full_pde, discretization; checks = false)
@@ -196,9 +196,7 @@ end
     # =============================================================================
 
     @testset "MountainWave2D Simplified PDESystem" begin
-        # Import MethodOfLines for PDE discretization testing
-        import MethodOfLines
-        import OrdinaryDiffEqDefault: Tsit5
+        # MethodOfLines and OrdinaryDiffEqDefault now imported in setup
 
         @testset "Simplified PDESystem Structure" begin
             pdesys = MountainWave2D()
@@ -224,7 +222,7 @@ end
             # Discretize with coarse grid
             dx = 1500.0  # m
             dz = 750.0   # m
-            discretization = MethodOfLines.MOLFiniteDifference([pdesys.domain[2].domain.left => dx, pdesys.domain[3].domain.left => dz], pdesys.domain[1].domain.left)
+            discretization = MethodOfLines.MOLFiniteDifference([pdesys.ivs[2] => dx, pdesys.ivs[3] => dz], pdesys.ivs[1])
 
             # Discretize the PDESystem
             prob = MethodOfLines.discretize(pdesys, discretization; checks = false)
@@ -342,8 +340,8 @@ end
             @test sys_run15 isa PDESystem
 
             # Verify that different mountain heights produce different systems
-            @test sys_run14.ps[findfirst(p -> p.description == "Mountain height (Eq. 7.1)", sys_run14.ps)].default !=
-                sys_run15.ps[findfirst(p -> p.description == "Mountain height (Eq. 7.1)", sys_run15.ps)].default
+            @test sys_run14.ps[findfirst(p -> ModelingToolkit.getdescription(p) == "Mountain height (Eq. 7.1)", sys_run14.ps)].default !=
+                sys_run15.ps[findfirst(p -> ModelingToolkit.getdescription(p) == "Mountain height (Eq. 7.1)", sys_run15.ps)].default
         end
 
         @testset "Witch of Agnesi Topography (Eq. 7.1)" begin
@@ -491,7 +489,7 @@ end
 
         # Test discretization (this is the critical step)
         try
-            using MethodOfLines
+            # MethodOfLines already imported in setup
             dx = 300.0  # Grid resolution
             dz = 200.0
 

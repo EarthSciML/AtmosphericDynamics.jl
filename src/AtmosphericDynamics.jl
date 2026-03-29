@@ -2,7 +2,7 @@ module AtmosphericDynamics
 
 using DocStringExtensions
 using ModelingToolkit: t, D, System, @variables, @parameters, @named,
-    @constants, @component, Differential, PDESystem
+    @constants, @component, Differential, PDESystem, Equation
 using DynamicQuantities: @u_str
 using DomainSets: Interval
 using EarthSciMLBase
