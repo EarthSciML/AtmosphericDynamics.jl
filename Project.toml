@@ -21,7 +21,7 @@ TestItemRunner = "f8b46487-2199-4994-9208-9a1283c18c0a"
 [compat]
 Coverage = "1.8.1"
 DocStringExtensions = "0.9.3"
-DomainSets = "0.7"
+DomainSets = "0.7, 0.8"
 DynamicQuantities = "1.4"
 EarthSciMLBase = "0.25"
 MethodOfLines = "0.11"
